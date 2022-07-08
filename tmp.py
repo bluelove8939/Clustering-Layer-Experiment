@@ -19,9 +19,9 @@ for thres in thresholds:
 
     accuracy, avg_loss = clustered.test(test_loader, model, loss_fn)
 
-    clustering_test_results.append(','.join([
+    clustering_test_results.append(','.join(map(str, [
         thres, accuracy, avg_loss, model.clust1.get_clust_amt(), model.clust2.get_clust_amt(),
-    ]))
+    ])))
 
 with open(resultfile_path, 'wt') as file:
     file.write('\n'.join(clustering_test_results))
