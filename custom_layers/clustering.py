@@ -35,6 +35,7 @@ def set_logger(info=None, verbose=False):
 
     return logger
 
+
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.shape
     img_flatten = torch.flatten(img)
@@ -46,7 +47,7 @@ def cluster_img(img, threshold, cacheline_size):
         bases = []
         for pidx in range(pivot, pivot + cacheline_size):
             flag = False
-            for idx, val in enumerate(bases):
+            for val in bases:
                 if abs(val - img_flatten[pidx]) < threshold:
                     img_flatten[pidx], flag = val, True
                     clust_cnt += 1
@@ -63,22 +64,18 @@ def cluster_img(img, threshold, cacheline_size):
 
 class ClusteringFunction(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, x, kernel_size, dilation, padding, stride, threshold, cacheline_size):
+    def forward(ctx, x, threshold, cacheline_size):
         x_clustered = cluster_img(x, threshold, cacheline_size)
         return x_clustered
 
     @staticmethod
     def backward(ctx, *grad_outputs):
-        return *grad_outputs, None, None, None, None, None, None, None
+        return *grad_outputs, None, None
 
 
 class ClusteringLayer(nn.Module):
-    def __init__(self, kernel_size, dilation=1, padding=0, stride=1, threshold=0, cacheline_size=64):
+    def __init__(self, threshold=0, cacheline_size=64):
         super(ClusteringLayer, self).__init__()
-        self.kernel_size = kernel_size
-        self.dilation = dilation
-        self.padding = padding
-        self.stride = stride
         self.threshold = threshold
         self.cacheline_size = cacheline_size
 
@@ -86,11 +83,11 @@ class ClusteringLayer(nn.Module):
         self._clust_cnt = 0
 
     def forward(self, x):
+        x_copied = x.clone().detach()
         logger.debug("clustering forward method called")
-        y = ClusteringFunction.apply(x,self.kernel_size, self.dilation, self.padding, self.stride,
-                                     self.threshold, self.cacheline_size)
-        cmp = torch.eq(x, y)
-        self._clust_amt_psum += torch.numel(cmp) - torch.count_nonzero(cmp)
+        y = ClusteringFunction.apply(x, self.threshold, self.cacheline_size)
+        cmp = torch.ne(x_copied, y)
+        self._clust_amt_psum += torch.count_nonzero(cmp).item() / torch.numel(y)
         self._clust_cnt += 1
         return y
 

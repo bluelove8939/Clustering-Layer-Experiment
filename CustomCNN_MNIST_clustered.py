@@ -29,19 +29,23 @@ class NetworkModel(nn.Module):
             nn.ReLU(),
 
         )
-        self.clust1 = clustering.ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
+        self.clust1 = clustering.ClusteringLayer(threshold=0.0005)
         self.conv2 = nn.Sequential(
             nn.Conv2d(3, 6, 3, 1, 1),
             nn.MaxPool2d(2),
             nn.ReLU(),
         )
-        self.clust2 = clustering.ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
+        self.clust2 = clustering.ClusteringLayer(threshold=0.0005)
         self.flatten = nn.Flatten()
         self.linear1 = nn.Sequential(
             nn.Linear(294, 500),
             nn.ReLU(),
         )
+        self.clust3 = clustering.ClusteringLayer(threshold=0.0005)
         self.linear2 = nn.Linear(500, 10)
+        self.clust4 = clustering.ClusteringLayer(threshold=0.0005)
+
+        self.clust_layers = [self.clust1, self.clust2, self.clust3, self.clust4]
 
     def forward(self, x):
         x = self.conv1(x)
@@ -50,16 +54,18 @@ class NetworkModel(nn.Module):
         x = self.clust2(x)
         x = self.flatten(x)
         x = self.linear1(x)
+        x = self.clust3(x)
         x = self.linear2(x)
+        x = self.clust4(x)
         return x
 
-    def set_clust_threshold(self, threshold):
-        self.clust1.threshold = threshold
-        self.clust2.threshold = threshold
+    def set_clust_threshold(self, *args):
+        for lay, thres in zip(self.clust_layers, args):
+            lay.threshold = thres
 
     def reset_clust_layer(self):
-        self.clust1.reset_clust_amt()
-        self.clust2.reset_clust_amt()
+        for lay in self.clust_layers:
+            lay.reset_clust_amt()
 
 
 train_dataset = datasets.MNIST(
