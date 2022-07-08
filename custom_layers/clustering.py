@@ -6,20 +6,34 @@ import datetime
 import torch
 import torch.nn as nn
 
+
 if 'logs' not in os.listdir():
     os.mkdir(os.path.join(os.curdir, 'logs'))
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(levelname)s] %(message)s')
-# stream_handler = logging.StreamHandler()
-# stream_handler.setFormatter(formatter)
-# logger.addHandler(stream_handler)
-logfile_path = os.path.join(os.curdir, 'logs', f'cluster_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
-logfile_handler = logging.FileHandler(logfile_path)
-logfile_handler.setFormatter(formatter)
-logger.addHandler(logfile_handler)
 
+
+def set_logger(info=None, verbose=False):
+    global logger
+
+    for hdlr in logger.handlers[:]:  # remove all old handlers
+        logger.removeHandler(hdlr)
+
+    if verbose:
+        stream_handler = logging.StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+
+    logfile_path = os.path.join(os.curdir, 'logs', f'cluster_{datetime.datetime.now().strftime("%Y%m%d_%H%M%S")}.log')
+    if info is not None:
+        logfile_path = os.path.join(os.curdir, 'logs', f'cluster_{info}.log')
+    logfile_handler = logging.FileHandler(logfile_path)
+    logfile_handler.setFormatter(formatter)
+    logger.addHandler(logfile_handler)
+
+    return logger
 
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.shape
@@ -29,19 +43,14 @@ def cluster_img(img, threshold, cacheline_size):
     length = img_flatten.shape[-1]
 
     while pivot + cacheline_size - 1 < length:
-        # logger.debug(f"pivot: {pivot + cacheline_size:4d}/{length - (length % cacheline_size):4d}")
-
         bases = []
-
         for pidx in range(pivot, pivot + cacheline_size):
             flag = False
-
             for idx, val in enumerate(bases):
                 if abs(val - img_flatten[pidx]) < threshold:
                     img_flatten[pidx], flag = val, True
                     clust_cnt += 1
                     break
-
             if not flag:
                 bases.append(img_flatten[pidx])
 
@@ -55,28 +64,8 @@ def cluster_img(img, threshold, cacheline_size):
 class ClusteringFunction(torch.autograd.Function):
     @staticmethod
     def forward(ctx, x, kernel_size, dilation, padding, stride, threshold, cacheline_size):
-        fold_params = dict(
-            kernel_size=kernel_size,
-            dilation=dilation,
-            padding=padding,
-            stride=stride,
-        )
-        ctx.save_for_backward(x)
-        fold_layer = nn.Fold(output_size=x.shape[2:], **fold_params)
-        unfold_layer = nn.Unfold(**fold_params)
-
-        x_unfolded = unfold_layer(x)
-
-        if len(x_unfolded.shape) == 2:
-            x_clustered = cluster_img(x_unfolded, threshold, cacheline_size)
-            return fold_layer(x_clustered)
-
-        batchsiz = x_unfolded.shape[0]
-        for bidx in range(batchsiz):
-            batch_clustered = cluster_img(x_unfolded[bidx], threshold, cacheline_size)
-            x_unfolded[bidx] = batch_clustered
-
-        return fold_layer(x_unfolded)
+        x_clustered = cluster_img(x, threshold, cacheline_size)
+        return x_clustered
 
     @staticmethod
     def backward(ctx, *grad_outputs):

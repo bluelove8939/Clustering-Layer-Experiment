@@ -13,7 +13,7 @@ import torchvision.datasets as datasets
 import matplotlib.pyplot as plt
 
 from tools.progressbar import progressbar
-from custom_layers.layers import ClusteringLayer
+from custom_layers import clustering
 
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -29,13 +29,13 @@ class NetworkModel(nn.Module):
             nn.ReLU(),
 
         )
-        self.clust1 = ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
+        self.clust1 = clustering.ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
         self.conv2 = nn.Sequential(
             nn.Conv2d(3, 6, 3, 1, 1),
             nn.MaxPool2d(2),
             nn.ReLU(),
         )
-        self.clust2 = ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
+        self.clust2 = clustering.ClusteringLayer(kernel_size=(3, 3), threshold=0.0005)
         self.flatten = nn.Flatten()
         self.linear1 = nn.Sequential(
             nn.Linear(294, 500),
@@ -111,12 +111,13 @@ def test(dataloader, model, loss_fn):
     model.eval()                    # convert model into evaluation mode
     test_loss, correct = 0, 0       # check total loss and count correctness
     with torch.no_grad():           # set all of the gradient into zero
+        print(f"\rtest status: {progressbar(0 + 1, len(dataloader), scale=50)} {0.0:2.0f}%",end='')
         for didx, (X, y) in enumerate(dataloader):
             X, y = X.to(device), y.to(device)     # extract input and output
             pred = model(X)                       # predict with the given model
             test_loss += loss_fn(pred, y).item()  # acculmulate total loss
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
-            print(f"\rtest status: {progressbar(didx, len(dataloader), scale=50)} {didx/len(dataloader)*100:2.0f}%", end='')
+            print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1)/len(dataloader)*100:2.0f}%", end='')
     test_loss /= num_batches   # make an average of the total loss
     correct /= size            # make an average with correctness count
     print(f"\nTest Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
