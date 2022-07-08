@@ -12,7 +12,7 @@ import CustomCNN_MNIST_clustered as clustered
 resultfile_name = 'clustering_test_results_diverse.csv'
 resultfile_path = os.path.join(os.curdir, 'logs', resultfile_name)
 clust_layer_num = 4
-thresholds = [2.0, 1.0, 0.5, 0.1, 0.05, 0.01, 0.005, 0.001]
+thresholds = [1, 0.5, 0.1, 0.05, 0.01]
 clustering_test_results = []
 
 # Test dataset generation
@@ -30,7 +30,7 @@ print('testing with normal model')
 accuracy, avg_loss = clustered.test(test_loader, model, loss_fn)
 
 clustering_test_results.append(','.join(map(str, [
-    0, 0, accuracy, avg_loss, 0, 0,
+    *([0]*clust_layer_num), accuracy, avg_loss, *([0]*clust_layer_num)
 ])))
 
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         accuracy, avg_loss = clustered.test(test_loader, model, loss_fn)
 
         clustering_test_results.append(','.join(map(str, [
-            *testcase, accuracy, avg_loss, model.clust1.get_clust_amt(), model.clust2.get_clust_amt(),
+            *testcase, accuracy, avg_loss, *model.get_clust_amt(),
         ])))
 
         with open(resultfile_path, 'wt') as file:

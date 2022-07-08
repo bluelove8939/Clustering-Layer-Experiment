@@ -63,6 +63,9 @@ class NetworkModel(nn.Module):
         for lay, thres in zip(self.clust_layers, args):
             lay.threshold = thres
 
+    def get_clust_amt(self):
+        return list(map(lambda x: x.get_clust_amt(), self.clust_layers))
+
     def reset_clust_layer(self):
         for lay in self.clust_layers:
             lay.reset_clust_amt()
