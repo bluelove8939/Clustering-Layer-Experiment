@@ -12,12 +12,12 @@ import CustomCNN_MNIST_clustered as clustered
 resultfile_name = 'clustering_test_results_diverse.csv'
 resultfile_path = os.path.join(os.curdir, 'logs', resultfile_name)
 clust_layer_num = 4
-thresholds = [1, 0.5, 0.1, 0.05, 0.01]
+thresholds = [1, 0.5, 0.1]
 clustering_test_results = []
 
 # Test dataset generation
 total_datasize = len(clustered.test_dataset)
-valid_datasize = int(total_datasize * 0.01)
+valid_datasize = int(total_datasize * 0.1)
 test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
 test_loader = DataLoader(test_dataset, batch_size=5)
 loss_fn = clustered.loss_fn
