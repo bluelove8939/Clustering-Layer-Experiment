@@ -100,7 +100,7 @@ def test(dataloader, model, loss_fn):
             pred = model(X)                       # predict with the given model
             test_loss += loss_fn(pred, y).item()  # acculmulate total loss
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
-            print(f"\rtest status: {progressbar(didx, len(dataloader), scale=50)} {didx / len(dataloader) * 100:2.0f}%",end='')
+            print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%",end='')
     test_loss /= num_batches   # make an average of the total loss
     correct /= size            # make an average with correctness count
     print(f"\nTest Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")

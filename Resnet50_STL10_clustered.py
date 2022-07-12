@@ -146,7 +146,7 @@ def test(dataloader, model, loss_fn):
             pred = model(X)                       # predict with the given model
             test_loss += loss_fn(pred, y).item()  # acculmulate total loss
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
-            print(f"\rtest status: {progressbar(didx, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%",end='')
+            print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%",end='')
     test_loss /= num_batches   # make an average of the total loss
     correct /= size            # make an average with correctness count
     print(f"\nTest Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
@@ -156,6 +156,55 @@ def test(dataloader, model, loss_fn):
 save_dirpath = os.path.join(os.curdir, 'model_output')
 save_modelname = "Resnet50_STL10_clustered.pth"
 save_fullpath = os.path.join(save_dirpath, save_modelname)
+
+
+def show_activations(model, channel_size=9):
+    import Resnet50_STL10_normal as normal
+
+    model.load_state_dict(torch.load(normal.save_fullpath))
+    model.reset_clust_layer()
+    model.set_clust_threshold(*[0.5, 0.5, 0.1, 0.01, 0.01])
+
+    activation = {}
+
+    def get_activation(name):
+        def hook(model, input, output):
+            activation[name] = output.detach()[0][:channel_size]
+            print(f"{name} called -> output shape: {output.detach().shape}")
+
+        return hook
+
+    model.conv1.register_forward_hook(get_activation('conv1'))
+    model.clust1.register_forward_hook(get_activation('layer1'))
+    model.clust2.register_forward_hook(get_activation('layer2'))
+    model.clust3.register_forward_hook(get_activation('layer3'))
+    model.clust4.register_forward_hook(get_activation('layer4'))
+    data, _ = test_dataset[0]
+    data.unsqueeze_(0)
+    model.eval()
+    output = model(data)
+
+    rgrid, cgrid = 0, 0
+    for key in activation.keys():
+        rgrid = max(rgrid, activation[key].squeeze().size(0))
+        cgrid += 1
+
+    fig, axs = plt.subplots(cgrid, rgrid)
+    fig.suptitle("Clustered Intermediate Activation Images")
+
+    ridx, cidx = 0, 0
+    for key in activation.keys():
+        act = activation[key].squeeze()
+        for ridx in range(rgrid):
+            if ridx < act.size(0):
+                axs[cidx, ridx].imshow(act[ridx])
+                axs[cidx, ridx].set_title(f"{key} channel{ridx}")
+            else:
+                axs[cidx, ridx].axis('off')
+        cidx += 1
+
+    plt.show()
+
 
 if __name__ == '__main__':
     epoch = 5
@@ -168,39 +217,4 @@ if __name__ == '__main__':
         os.mkdir(os.path.join(os.curdir, 'model_output'))
     torch.save(model.state_dict(), save_fullpath)
 
-
-# activation = {}
-#
-# def get_activation(name):
-#     def hook(model, input, output):
-#         activation[name] = output.detach()
-#     return hook
-#
-#
-# model.conv1.register_forward_hook(get_activation('conv1'))
-# model.conv2.register_forward_hook(get_activation('conv2'))
-# data, _ = test_dataset[0]
-# data.unsqueeze_(0)
-# model.eval()
-# output = model(data)
-#
-# rgrid, cgrid = 0, 0
-# for key in activation.keys():
-#     rgrid = max(rgrid, activation[key].squeeze().size(0))
-#     cgrid += 1
-#
-# fig, axs = plt.subplots(cgrid, rgrid)
-# fig.suptitle("Intermediate Activation Images")
-#
-# ridx, cidx = 0, 0
-# for key in activation.keys():
-#     act = activation[key].squeeze()
-#     for ridx in range(rgrid):
-#         if ridx < act.size(0):
-#             axs[cidx, ridx].imshow(act[ridx])
-#             axs[cidx, ridx].set_title(f"{key} channel{ridx}")
-#         else:
-#             axs[cidx, ridx].axis('off')
-#     cidx += 1
-#
-# plt.show()
+    # show_activations(model, channel_size=9)
