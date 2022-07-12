@@ -40,14 +40,14 @@ train_dataset = datasets.STL10(
     split='train',
     download=True,
     transform=transforms.ToTensor()
-).to(device)
+)
 
 test_dataset = datasets.STL10(
     root=os.path.join(os.curdir, '../data'),
     split='test',
     download=True,
     transform=transforms.ToTensor()
-).to(device)
+)
 
 train_transforms = transforms.Compose([transforms.Resize((128, 128)),
                                        transforms.ToTensor(),
