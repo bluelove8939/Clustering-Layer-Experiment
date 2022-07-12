@@ -50,10 +50,10 @@ test_dataset = datasets.STL10(
 
 train_transforms = transforms.Compose([transforms.Resize((128, 128)),
                                        transforms.ToTensor(),
-                                       transforms.Normalize(get_mean(train_dataset), get_std(train_dataset))])
+                                       transforms.Normalize(get_mean(train_dataset), get_std(train_dataset))]).to(device)
 test_transforms = transforms.Compose([transforms.Resize((128, 128)),
                                       transforms.ToTensor(),
-                                      transforms.Normalize(get_mean(test_dataset), get_std(test_dataset))])
+                                      transforms.Normalize(get_mean(test_dataset), get_std(test_dataset))]).to(device)
 
 train_dataset.transforms = train_transforms
 test_dataset.transforms = test_transforms

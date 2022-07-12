@@ -76,14 +76,14 @@ train_dataset = datasets.MNIST(
     train=True,
     download=True,
     transform=transforms.ToTensor()
-)
+).to(device)
 
 test_dataset = datasets.MNIST(
     root=os.path.join(os.curdir, '../data'),
     train=False,
     download=True,
     transform=transforms.ToTensor()
-)
+).to(device)
 
 train_loader = DataLoader(train_dataset, batch_size=8, shuffle=True)
 test_loader = DataLoader(test_dataset, batch_size=8, shuffle=True)
