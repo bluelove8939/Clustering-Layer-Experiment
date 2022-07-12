@@ -108,14 +108,14 @@ def test(dataloader, model, loss_fn):
 
 
 save_dirpath = os.path.join(os.curdir, 'model_output')
-if save_dirpath not in os.listdir(os.curdir):
+if not os.path.exists(save_dirpath):
     os.makedirs(save_dirpath)
 save_modelname = "Resnet50_STL10_normal.pth"
 save_fullpath = os.path.join(save_dirpath, save_modelname)
 
 def show_activations(model, channel_size=9):
     save_image_dirpath = os.path.join(os.curdir, 'model_activations')
-    if save_image_dirpath not in os.listdir(os.curdir):
+    if not os.path.exists(save_image_dirpath):
         os.makedirs(save_image_dirpath)
     save_imagename = f"Resnet50_STL10_normal_channel_{channel_size}.png"
     save_image_fullpath = os.path.join(save_image_dirpath, save_imagename)
