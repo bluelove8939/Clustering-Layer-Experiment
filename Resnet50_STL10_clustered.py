@@ -207,6 +207,7 @@ def show_activations(model, channel_size=9):
                 axs[cidx, ridx].axis('off')
         cidx += 1
 
+    plt.tight_layout()
     plt.savefig(save_image_fullpath)
     plt.show()
 
