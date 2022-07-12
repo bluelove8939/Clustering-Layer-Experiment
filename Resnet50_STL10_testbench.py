@@ -12,7 +12,7 @@ import Resnet50_STL10_clustered as clustered
 resultfile_name = 'resnet_testbench_result.csv'
 resultfile_path = os.path.join(os.curdir, 'logs', resultfile_name)
 clust_layer_num = 5
-thresholds = [0.1, 0.05, 0.01]
+thresholds = [0.1, 0.08, 0.05, 0.02, 0.01, 0.005]
 clustering_test_results = []
 
 # Test dataset generation
@@ -57,7 +57,7 @@ def test_case_gen(layer_num, **kwargs):
 
 # Main testbench
 if __name__ == '__main__':
-    for testcase in test_case_gen(clust_layer_num, uniform=True):
+    for testcase in test_case_gen(clust_layer_num, uniform=False):
         # clustered.clustering.set_logger(info=f"{testcase}", verbose=False)
 
         model = clustered.model
