@@ -146,7 +146,7 @@ def show_activations(model, channel_size=9):
         act = activation[key].squeeze()
         for ridx in range(rgrid):
             if ridx < act.size(0):
-                axs[cidx, ridx].imshow(act[ridx])
+                axs[cidx, ridx].imshow(act[ridx].to('cpu'))
             else:
                 axs[cidx, ridx].axis('off')
         cidx += 1
