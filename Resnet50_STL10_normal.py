@@ -108,10 +108,18 @@ def test(dataloader, model, loss_fn):
 
 
 save_dirpath = os.path.join(os.curdir, 'model_output')
+if save_dirpath not in os.listdir(os.curdir):
+    os.mkdir(save_dirpath)
 save_modelname = "Resnet50_STL10_normal.pth"
 save_fullpath = os.path.join(save_dirpath, save_modelname)
 
 def show_activations(model, channel_size=9):
+    save_image_dirpath = os.path.join(os.curdir, 'model_output')
+    if save_image_dirpath not in os.listdir(os.curdir):
+        os.mkdir(save_image_dirpath)
+    save_imagename = f"Resnet50_STL10_normal_channel_{channel_size}.png"
+    save_image_fullpath = os.path.join(save_image_dirpath, save_imagename)
+
     model.load_state_dict(torch.load(save_fullpath))
     activation = {}
 
@@ -151,6 +159,7 @@ def show_activations(model, channel_size=9):
                 axs[cidx, ridx].axis('off')
         cidx += 1
 
+    plt.savefig(save_image_fullpath)
     plt.show()
 
 
