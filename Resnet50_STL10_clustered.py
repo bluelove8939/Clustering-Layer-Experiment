@@ -180,7 +180,7 @@ def show_activations(model, channel_size=9):
     data, _ = test_dataset[0]
     data.unsqueeze_(0)
     model.eval()
-    output = model(data)
+    output = model(data.to(device))
 
     rgrid, cgrid = 0, 0
     for key in activation.keys():
