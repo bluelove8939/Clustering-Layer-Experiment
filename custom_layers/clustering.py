@@ -36,30 +36,46 @@ def set_logger(info=None, verbose=False):
     return logger
 
 
+# # Deprecated cluster_img method
+# def cluster_img(img, threshold, cacheline_size):
+#     img_shape = img.shape
+#     img_flatten = torch.flatten(img)
+#     pivot = 0
+#     clust_cnt = 0
+#     length = img_flatten.shape[-1]
+#
+#     while pivot + cacheline_size - 1 < length:
+#         bases = []
+#         for pidx in range(pivot, pivot + cacheline_size):
+#             flag = False
+#             for val in bases:
+#                 if abs(val - img_flatten[pidx]) < threshold:
+#                     img_flatten[pidx], flag = val, True
+#                     clust_cnt += 1
+#                     break
+#             if not flag:
+#                 bases.append(img_flatten[pidx])
+#
+#         pivot += cacheline_size
+#
+#     logger.debug(f"clustered result: {clust_cnt}/{length}")
+#
+#     return torch.reshape(img_flatten, img_shape)
+
+
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.shape
-    img_flatten = torch.flatten(img)
-    pivot = 0
-    clust_cnt = 0
-    length = img_flatten.shape[-1]
+    img_reshaped = img.view(-1, cacheline_size)
+    masks = torch.ones_like(img_reshaped)
 
-    while pivot + cacheline_size - 1 < length:
-        bases = []
-        for pidx in range(pivot, pivot + cacheline_size):
-            flag = False
-            for val in bases:
-                if abs(val - img_flatten[pidx]) < threshold:
-                    img_flatten[pidx], flag = val, True
-                    clust_cnt += 1
-                    break
-            if not flag:
-                bases.append(img_flatten[pidx])
+    for idx in range(cacheline_size):
+        sel_column = img_reshaped[:, idx]
+        masks[:, idx] = 0
+        sel_column = sel_column.repeat(cacheline_size, 1).transpose(0, 1)
+        delta_masks = (torch.abs(img_reshaped - sel_column).le(threshold) * masks).type(torch.bool)
+        img_reshaped = torch.where(delta_masks == True, sel_column, img_reshaped)
 
-        pivot += cacheline_size
-
-    logger.debug(f"clustered result: {clust_cnt}/{length}")
-
-    return torch.reshape(img_flatten, img_shape)
+    return torch.reshape(img_reshaped, img_shape)
 
 
 class ClusteringFunction(torch.autograd.Function):
@@ -100,3 +116,17 @@ class ClusteringLayer(nn.Module):
 
     def string(self):
         return "Custom Layer: Clustering"
+
+
+# if __name__ == '__main__':
+#     img = torch.tensor(
+#         [
+#             [1, 3, 2, 4],
+#             [2, 2, 1, 2],
+#             [3, 2, 4, 4],
+#             [2, 3, 1, 1],
+#         ]
+#     )
+#
+#     print(img)
+#     print(cluster_img_updated(img, 1, 8))
