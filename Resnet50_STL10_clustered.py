@@ -162,8 +162,6 @@ def show_activations(model, channel_size=9):
     import Resnet50_STL10_normal as normal
 
     model.load_state_dict(torch.load(normal.save_fullpath))
-    model.reset_clust_layer()
-    model.set_clust_threshold(*[0.5, 0.5, 0.1, 0.01, 0.01])
 
     activation = {}
 
@@ -174,11 +172,11 @@ def show_activations(model, channel_size=9):
 
         return hook
 
-    model.conv1.register_forward_hook(get_activation('conv1'))
-    model.clust1.register_forward_hook(get_activation('layer1'))
-    model.clust2.register_forward_hook(get_activation('layer2'))
-    model.clust3.register_forward_hook(get_activation('layer3'))
-    model.clust4.register_forward_hook(get_activation('layer4'))
+    model.clust1.register_forward_hook(get_activation('conv1'))
+    model.clust2.register_forward_hook(get_activation('layer1'))
+    model.clust3.register_forward_hook(get_activation('layer2'))
+    model.clust4.register_forward_hook(get_activation('layer3'))
+    model.clust5.register_forward_hook(get_activation('layer4'))
     data, _ = test_dataset[0]
     data.unsqueeze_(0)
     model.eval()
@@ -198,7 +196,6 @@ def show_activations(model, channel_size=9):
         for ridx in range(rgrid):
             if ridx < act.size(0):
                 axs[cidx, ridx].imshow(act[ridx])
-                axs[cidx, ridx].set_title(f"{key} channel{ridx}")
             else:
                 axs[cidx, ridx].axis('off')
         cidx += 1
