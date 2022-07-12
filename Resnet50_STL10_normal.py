@@ -160,8 +160,8 @@ def show_activations(model, channel_size=9):
         cidx += 1
 
     # plt.tight_layout()
-    plt.savefig(save_image_fullpath)
     plt.show()
+    plt.savefig(save_image_fullpath)
 
 
 if __name__ == '__main__':
