@@ -39,21 +39,21 @@ train_dataset = datasets.STL10(
     split='train',
     download=True,
     transform=transforms.ToTensor()
-)
+).to(device)
 
 test_dataset = datasets.STL10(
     root=os.path.join(os.curdir, '../data'),
     split='test',
     download=True,
     transform=transforms.ToTensor()
-)
+).to(device)
 
 train_transforms = transforms.Compose([transforms.Resize((128, 128)),
                                        transforms.ToTensor(),
-                                       transforms.Normalize(get_mean(train_dataset), get_std(train_dataset))]).to(device)
+                                       transforms.Normalize(get_mean(train_dataset), get_std(train_dataset))])
 test_transforms = transforms.Compose([transforms.Resize((128, 128)),
                                       transforms.ToTensor(),
-                                      transforms.Normalize(get_mean(test_dataset), get_std(test_dataset))]).to(device)
+                                      transforms.Normalize(get_mean(test_dataset), get_std(test_dataset))])
 
 train_dataset.transforms = train_transforms
 test_dataset.transforms = test_transforms
