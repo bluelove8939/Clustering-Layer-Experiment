@@ -146,9 +146,7 @@ def show_activations(model, channel_size=9):
         cgrid += 1
     print(f"rgrid: {rgrid}, cgrid: {cgrid}")
 
-    fig, axs = plt.subplots(cgrid, rgrid)
-    fig.set_figheight(15)
-    fig.set_figwidth(15)
+    fig, axs = plt.subplots(cgrid, rgrid, figsize=(5, 5))
     fig.suptitle("Normal Intermediate Activation Images")
 
     ridx, cidx = 0, 0
