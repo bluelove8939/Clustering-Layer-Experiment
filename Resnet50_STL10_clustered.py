@@ -194,7 +194,7 @@ def show_activations(model, channel_size=9):
         rgrid = max(rgrid, activation[key].squeeze().size(0))
         cgrid += 1
 
-    fig, axs = plt.subplots(cgrid, rgrid, figsize=(8 * rgrid, 8 * cgrid), gridspec_kw={'width_ratios': [1] * rgrid})
+    fig, axs = plt.subplots(cgrid, rgrid, figsize=(4 * rgrid, 4 * cgrid), gridspec_kw={'width_ratios': [1] * rgrid})
     fig.suptitle("Clustered Intermediate Activation Images")
 
     ridx, cidx = 0, 0
@@ -203,6 +203,7 @@ def show_activations(model, channel_size=9):
         for ridx in range(rgrid):
             if ridx < act.size(0):
                 axs[cidx, ridx].imshow(act[ridx].to('cpu'))
+                axs[cidx, ridx].set_title(f"{key}_channel{ridx}")
             else:
                 axs[cidx, ridx].axis('off')
         cidx += 1
