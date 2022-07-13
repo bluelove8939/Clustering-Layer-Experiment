@@ -16,7 +16,15 @@ import matplotlib.pyplot as plt
 
 # from tools.progressbar import progressbar
 from tools.training import train, test
+from tools.pruning import PruneModule
 from custom_layers import clustering
+
+# parse commandline args
+import argparse
+parser = argparse.ArgumentParser(description='Resnet50 training config')
+parser.add_argument('--pamount', action='store' , type=float, default=0.3)
+args = parser.parse_args()
+
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -60,8 +68,8 @@ test_transforms = transforms.Compose([transforms.Resize((128, 128)),
 train_dataset.transforms = train_transforms
 test_dataset.transforms = test_transforms
 
-train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=100, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=50, shuffle=True)
 
 
 # Customize pretrained reference model
@@ -116,6 +124,10 @@ model = NetworkModel(torchvision.models.resnet.Bottleneck, [3, 4, 6, 3], 1000).t
 lr = 0.0001
 optimizer = optim.Adam(model.parameters(), lr=lr)
 loss_fn = nn.CrossEntropyLoss().to(device)
+
+# Pruning Configs
+prune_amount = args.pamount
+pmodule = PruneModule(train_loader, loss_fn=loss_fn, optimizer=optimizer)
 
 # Model Saving Configs
 save_dirpath = os.path.join(os.curdir, 'model_output')
@@ -184,6 +196,9 @@ if __name__ == '__main__':
     for eidx in range(epoch):
         print(f"\nEpoch: {eidx}")
         train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer)
+    test(test_loader, model, loss_fn=loss_fn)
+
+    pmodule.prune_model(model)
     test(test_loader, model, loss_fn=loss_fn)
 
     if 'model_output' not in os.listdir(os.curdir):
