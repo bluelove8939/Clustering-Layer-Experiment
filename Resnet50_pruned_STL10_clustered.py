@@ -3,7 +3,6 @@ import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import torch.nn.functional as F
 from torch.utils.data import DataLoader
 
 import torchvision
@@ -22,7 +21,12 @@ from custom_layers import clustering
 # parse commandline args
 import argparse
 parser = argparse.ArgumentParser(description='Resnet50 training config')
-parser.add_argument('--pamount', action='store' , type=float, default=0.3)
+parser.add_argument('--pamount', action='store' , type=float, default=0.3, help="pruning amount")
+parser.add_argument('--step', action='store' , type=float, default=0.1, help="pruning step")
+parser.add_argument('--thres', action='store' , type=float, default=1,
+                    help="accuracy threshold value (difference between normal accyracy and pruned model accyracy, "
+                         "percent scale)")
+parser.add_argument('--tuneiter', action='store' , type=int, default=5, help="fine tuning maximum iteration value")
 args = parser.parse_args()
 
 
