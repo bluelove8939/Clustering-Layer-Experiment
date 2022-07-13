@@ -25,10 +25,10 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         loss, current = loss.item(), (batch+1) * dataloader.batch_size
 
         if verbose == 1:
-            print(f"\r{progressbar(current, size, scale=50)} {current / size * 100:2.0f}%"
+            print(f"\r{progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
                   f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]", end="")
         elif verbose:
-            print(f"{progressbar(current, size, scale=50)} {current / size * 100:2.0f}%"
+            print(f"{progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
                   f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
 
     if verbose == 1: print('')
@@ -47,9 +47,11 @@ def test(dataloader, model, loss_fn, verbose=2):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
 
             if verbose == 1:
-                print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%",end='')
+                print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} "
+                      f"{(didx+1) / len(dataloader) * 100:3.0f}%",end='')
             elif verbose:
-                print(f"test status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%")
+                print(f"test status: {progressbar(didx+1, len(dataloader), scale=50)} "
+                      f"{(didx+1) / len(dataloader) * 100:3.0f}%")
 
     test_loss /= num_batches   # make an average of the total loss
     correct /= size            # make an average with correctness count
