@@ -39,7 +39,7 @@ class PruneModule(object):
         print("\nPruning Configs")
         print(f"- target_amount: {target_amount:.4f}")
         print(f"- loss_fn: {self.loss_fn}")
-        print(f"- threshold: {threshold}\n")
+        print(f"- threshold: {threshold}")
         print(f"- step: {step}")
         print(f"- max_iter: {max_iter}")
         print(f"- pass_normal: {pass_normal}")
