@@ -36,33 +36,6 @@ def set_logger(info=None, verbose=False):
     return logger
 
 
-# # Deprecated cluster_img method
-# def cluster_img(img, threshold, cacheline_size):
-#     img_shape = img.shape
-#     img_flatten = torch.flatten(img)
-#     pivot = 0
-#     clust_cnt = 0
-#     length = img_flatten.shape[-1]
-#
-#     while pivot + cacheline_size - 1 < length:
-#         bases = []
-#         for pidx in range(pivot, pivot + cacheline_size):
-#             flag = False
-#             for val in bases:
-#                 if abs(val - img_flatten[pidx]) < threshold:
-#                     img_flatten[pidx], flag = val, True
-#                     clust_cnt += 1
-#                     break
-#             if not flag:
-#                 bases.append(img_flatten[pidx])
-#
-#         pivot += cacheline_size
-#
-#     logger.debug(f"clustered result: {clust_cnt}/{length}")
-#
-#     return torch.reshape(img_flatten, img_shape)
-
-
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.shape
     img_reshaped = img.view(-1, cacheline_size)
