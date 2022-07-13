@@ -83,15 +83,15 @@ class PruneModule(object):
                 print(f"pruning amount: {chkpoint_pruning_amount}")
                 return model
 
-            if (1 - current_density) > target_amount:
-                break
-
             chkpoint = model.state_dict()
             chkpoint_pruning_amount = 1 - current_density
             chkpoint_acc = current_acc
             chkpoint_avg_loss = current_avg_loss
             print(f"check point generated")
             print(f"pamount: {chkpoint_pruning_amount}  acc: {chkpoint_acc}  avg_loss: {chkpoint_avg_loss}\n")
+
+            if (1 - current_density) > target_amount:
+                break
 
         model.load_state_dict(chkpoint)
         print(f"pruning succeed: acc({chkpoint_acc}) avg_loss({chkpoint_avg_loss})")
