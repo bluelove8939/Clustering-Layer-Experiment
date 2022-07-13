@@ -21,7 +21,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         optimizer.zero_grad()  # gradient initialization (just because torch accumulates gradient)
         loss.backward()        # backward propagate with the loss value (or vector)
         optimizer.step()       # update parameters
-
+        print(batch)
         if batch % 200 == 0:
             loss, current = loss.item(), batch * len(X)
 
