@@ -133,20 +133,23 @@ pmodule = PruneModule(train_loader, loss_fn=loss_fn, optimizer=optimizer)
 save_dirpath = os.path.join(os.curdir, 'model_output')
 if not os.path.exists(save_dirpath):
     os.makedirs(save_dirpath)
-save_modelname = "Resnet50_STL10_clustered.pth"
-save_fullpath = os.path.join(save_dirpath, save_modelname)
+
+def save_fullpath(pamount):
+    save_modelname = f"Resnet50_pruned{pamount * 100:.0f}_STL10_normal.pth"
+    save_fullpath = os.path.join(save_dirpath, save_modelname)
+    return save_fullpath
 
 
 def show_activations(model, channel_size=9):
     save_image_dirpath = os.path.join(os.curdir, 'model_activations')
     if not os.path.exists(save_image_dirpath):
         os.makedirs(save_image_dirpath)
-    save_imagename = f"Resnet50_STL10_clustered_channel_{channel_size}.png"
+    save_imagename = f"{save_fullpath(pamount=prune_amount).split('.')[0]}_csize{channel_size}.png"
     save_image_fullpath = os.path.join(save_image_dirpath, save_imagename)
 
     import Resnet50_STL10_normal as normal
 
-    model.load_state_dict(torch.load(normal.save_fullpath))
+    model.load_state_dict(torch.load(normal.save_fullpath(pamount=prune_amount)))
 
     activation = {}
 
@@ -203,6 +206,6 @@ if __name__ == '__main__':
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
-    torch.save(model.state_dict(), save_fullpath)
+    torch.save(model.state_dict(), save_fullpath(pamount=prune_amount))
 
     # show_activations(model, channel_size=9)
