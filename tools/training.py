@@ -29,8 +29,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         elif verbose:
             print(f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
 
-    if verbose == 1: print('\n')
-    elif verbose: print()
+    if verbose == 1: print('')
 
 
 def test(dataloader, model, loss_fn, verbose=2):
@@ -55,6 +54,6 @@ def test(dataloader, model, loss_fn, verbose=2):
 
     if verbose:
         if verbose == 1: print()
-        print(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}\n")
+        print(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}")
 
     return 100 * correct, test_loss

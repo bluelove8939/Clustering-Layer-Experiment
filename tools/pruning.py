@@ -59,8 +59,11 @@ class PruneModule(object):
         chkpoint_acc = 0
         chkpoint_avg_loss = 0
         current_density = 1
+        step_cnt = 0
 
         while True:
+            step_cnt += 1
+            print(f"iter: {step_cnt}")
             pruning_step_succeed = False
             current_density *= (1 - step)
             self.prune_layer(model, step)
@@ -87,6 +90,8 @@ class PruneModule(object):
             chkpoint_pruning_amount = 1 - current_density
             chkpoint_acc = current_acc
             chkpoint_avg_loss = current_avg_loss
+            print(f"check point generated")
+            print(f"pamount: {chkpoint_pruning_amount}  acc: {chkpoint_acc}  avg_loss: {chkpoint_avg_loss}\n")
 
         model.load_state_dict(chkpoint)
         print(f"pruning succeed: acc({chkpoint_acc}) avg_loss({chkpoint_avg_loss})")
