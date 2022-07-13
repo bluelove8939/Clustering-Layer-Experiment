@@ -25,9 +25,11 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         loss, current = loss.item(), (batch+1) * dataloader.batch_size
 
         if verbose == 1:
-            print(f"\rloss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]", end="")
+            print(f"\r{progressbar(current, size, scale=50)} {current / size * 100:2.0f}%"
+                  f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]", end="")
         elif verbose:
-            print(f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
+            print(f"{progressbar(current, size, scale=50)} {current / size * 100:2.0f}%"
+                  f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
 
     if verbose == 1: print('')
 
