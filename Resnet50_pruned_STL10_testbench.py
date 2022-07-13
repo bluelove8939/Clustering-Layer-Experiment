@@ -1,9 +1,10 @@
+import torch
 import Resnet50_STL10_normal as normal
 from tools.pruning import PruneModule
 
 
 model = normal.model
-model.load_state_dict(normal.save_fullpath)
+model.load_state_dict(torch.load(normal.save_fullpath))
 tuning_dataloader = normal.train_loader
 loss_fn = normal.loss_fn
 optimizer = normal.optimizer
