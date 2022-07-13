@@ -21,14 +21,13 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         optimizer.zero_grad()  # gradient initialization (just because torch accumulates gradient)
         loss.backward()        # backward propagate with the loss value (or vector)
         optimizer.step()       # update parameters
-        print(batch)
-        if batch % 200 == 0:
-            loss, current = loss.item(), batch * len(X)
 
-            if verbose == 1:
-                print(f"\rloss: {loss:>7f}  [{current:>5d}/{size:>5d}]", end="")
-            elif verbose:
-                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+        loss, current = loss.item(), batch * len(X)
+
+        if verbose == 1:
+            print(f"\rloss: {loss:>7f}  [{current*dataloader.batch_size:>5d}/{size:>5d}]", end="")
+        elif verbose:
+            print(f"loss: {loss:>7f}  [{current*dataloader.batch_size:>5d}/{size:>5d}]")
 
     if verbose == 1: print('\n')
     elif verbose: print()
