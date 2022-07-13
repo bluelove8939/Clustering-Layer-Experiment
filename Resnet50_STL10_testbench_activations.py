@@ -10,9 +10,10 @@ import Resnet50_STL10_clustered as clustered
 
 # Test dataset generation
 total_datasize = len(clustered.test_dataset)
-valid_datasize = int(total_datasize / 40)
+valid_datasize = int(total_datasize)
 print(f"test dataset size: {valid_datasize}/{total_datasize}")
-test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
+# test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
+test_dataset = clustered.test_dataset
 test_loader = DataLoader(test_dataset, batch_size=10)
 loss_fn = clustered.loss_fn
 
@@ -23,7 +24,7 @@ normal_acc, normal_avg_loss = normal.test(test_loader, normal_model, loss_fn)
 model = clustered.model
 model.load_state_dict(torch.load(normal.save_fullpath))
 model.reset_clust_layer()
-model.set_clust_threshold(*[0.1, 0.1, 0.1, 0.01, 0.01])
+model.set_clust_threshold(*[0.02, 0.01, 0.08, 0.05, 0.08])
 clust_acc, clust_avg_loss = clustered.test(test_loader, model, loss_fn)
 
 print(f"normal test result:    acc({normal_acc}), avg loss({normal_avg_loss:.6f})")
