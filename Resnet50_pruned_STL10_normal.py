@@ -49,7 +49,7 @@ def get_std(dataset):
 
 train_dataset = datasets.STL10(
     root=os.path.join(os.curdir, '../data'),
-    split='test',
+    split='train',
     download=True,
     transform=transforms.ToTensor()
 )
