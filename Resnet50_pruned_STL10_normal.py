@@ -25,7 +25,7 @@ parser.add_argument('--step', action='store' , type=float, default=0.1, help="pr
 parser.add_argument('--thres', action='store' , type=float, default=1,
                     help="accuracy threshold value (difference between normal accyracy and pruned model accyracy, "
                          "percent scale)")
-parser.add_argument('--tuneiter', action='store' , type=float, default=5, help="fine tuning maximum iteration value")
+parser.add_argument('--tuneiter', action='store' , type=int, default=5, help="fine tuning maximum iteration value")
 args = parser.parse_args()
 
 
