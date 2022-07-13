@@ -90,7 +90,7 @@ pmodule = PruneModule(train_loader, loss_fn=loss_fn, optimizer=optimizer)
 save_dirpath = os.path.join(os.curdir, 'model_output')
 if not os.path.exists(save_dirpath):
     os.makedirs(save_dirpath)
-save_modelname = f"Resnet50_pruned{prune_amount}_STL10_normal.pth"
+save_modelname = f"Resnet50_pruned{prune_amount*100:d}_STL10_normal.pth"
 save_fullpath = os.path.join(save_dirpath, save_modelname)
 
 
