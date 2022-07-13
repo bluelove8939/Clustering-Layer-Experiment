@@ -20,7 +20,12 @@ from tools.pruning import PruneModule
 # parse commandline args
 import argparse
 parser = argparse.ArgumentParser(description='Resnet50 training config')
-parser.add_argument('--pamount', action='store' , type=float, default=0.3)
+parser.add_argument('--pamount', action='store' , type=float, default=0.3, help="pruning amount")
+parser.add_argument('--step', action='store' , type=float, default=0.1, help="pruning step")
+parser.add_argument('--thres', action='store' , type=float, default=1,
+                    help="accuracy threshold value (difference between normal accyracy and pruned model accyracy, "
+                         "percent scale)")
+parser.add_argument('--tuneiter', action='store' , type=float, default=5, help="fine tuning maximum iteration value")
 args = parser.parse_args()
 
 
@@ -145,10 +150,15 @@ if __name__ == '__main__':
     epoch = 5
     for eidx in range(epoch):
         print(f"\nEpoch: {eidx}")
-        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=2)
+        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
-    pmodule.prune_model(model)
+    threshold = args.thres
+    step = args.step
+    max_iter = args.tuneiter
+
+    pmodule.prune_model(model, target_amount=prune_amount, threshold=threshold, step=step, max_iter=max_iter,
+                        pass_normal=False, verbose=1)
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     if 'model_output' not in os.listdir(os.curdir):
