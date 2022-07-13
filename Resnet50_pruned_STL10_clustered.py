@@ -195,11 +195,11 @@ if __name__ == '__main__':
     epoch = 5
     for eidx in range(epoch):
         print(f"\nEpoch: {eidx}")
-        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer)
-    test(test_loader, model, loss_fn=loss_fn)
+        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=2)
+    test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     pmodule.prune_model(model)
-    test(test_loader, model, loss_fn=loss_fn)
+    test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
