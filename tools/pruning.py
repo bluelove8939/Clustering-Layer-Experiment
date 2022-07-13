@@ -1,5 +1,4 @@
 import torch
-from torch.utils.data import DataLoader
 import torch.nn.utils.prune as prune
 
 from tools.progressbar import progressbar
@@ -48,7 +47,7 @@ class PruneModule(object):
         if not pass_normal:
             print("testing normal model...")
             normal_acc, normal_avg_loss = test(self.tuning_dataloader, model, loss_fn=self.loss_fn, verbose=verbose)
-            print(f"normal model test result: acc({normal_acc}) avg_loss({normal_avg_loss})")
+            print(f"normal model test result: acc({normal_acc:.4f}) avg_loss({normal_avg_loss:.4f})")
         else:
             print("normal model test passed")
             normal_acc = 100
@@ -79,7 +78,7 @@ class PruneModule(object):
 
             if not pruning_step_succeed:
                 model.load_state_dict(chkpoint)
-                print(f"pruning failed: acc({current_acc}) avg_loss({current_avg_loss})")
+                print(f"pruning failed: acc({current_acc:.4f}) avg_loss({current_avg_loss:.4f})")
                 print(f"pruning amount: {chkpoint_pruning_amount}")
                 return model
 
@@ -87,10 +86,10 @@ class PruneModule(object):
             chkpoint_pruning_amount = 1 - current_density
             chkpoint_acc = current_acc
             chkpoint_avg_loss = current_avg_loss
-            print(f"check point generated")
-            print(f"pamount: {chkpoint_pruning_amount}  acc: {chkpoint_acc}  avg_loss: {chkpoint_avg_loss}\n")
+            print(f"check point generated pamount({chkpoint_pruning_amount:.4f}) acc({chkpoint_acc:.4f}) "
+                  f"avg_loss({chkpoint_avg_loss:.4f})\n")
 
-            if (1 - current_density) > target_amount:
+            if round(1 - current_density) >= target_amount:
                 break
 
         model.load_state_dict(chkpoint)
