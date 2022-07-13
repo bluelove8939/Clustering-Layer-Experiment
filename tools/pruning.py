@@ -86,10 +86,10 @@ class PruneModule(object):
             chkpoint_pruning_amount = 1 - current_density
             chkpoint_acc = current_acc
             chkpoint_avg_loss = current_avg_loss
-            print(f"check point generated pamount({chkpoint_pruning_amount:.4f}) acc({chkpoint_acc:.4f}) "
+            print(f"check point generated: pamount({chkpoint_pruning_amount:.4f}) acc({chkpoint_acc:.4f}) "
                   f"avg_loss({chkpoint_avg_loss:.4f})\n")
 
-            if round(1 - current_density) >= target_amount:
+            if round(chkpoint_pruning_amount, 1) >= target_amount:
                 break
 
         model.load_state_dict(chkpoint)
