@@ -87,6 +87,7 @@ class ClusteringLayer(nn.Module):
 
     def reset_clust_amt(self):
         self._clust_amt_psum = 0
+        self._clust_base_cnt = 0
         self._clust_cnt = 0
 
     def get_clust_amt(self):
