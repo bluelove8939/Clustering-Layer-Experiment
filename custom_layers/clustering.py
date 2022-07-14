@@ -81,7 +81,7 @@ class ClusteringLayer(nn.Module):
         y = ClusteringFunction.apply(x, self.threshold, self.cacheline_size)
         cmp = torch.ne(x_copied, y)
         self._clust_amt_psum += torch.count_nonzero(cmp).item() / torch.numel(y)
-        self._clust_base_cnt += torch.unique(y) / torch.numel(y)
+        self._clust_base_cnt += torch.numel(torch.unique(y)) / torch.numel(y)
         self._clust_cnt += 1
         return y
 
