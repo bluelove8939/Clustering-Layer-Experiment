@@ -103,6 +103,9 @@ class NetworkModel(torchvision.models.ResNet):
     def get_clust_amt(self):
         return list(map(lambda x: x.get_clust_amt(), self.clust_layers))
 
+    def get_clust_base_cnt(self):
+        return list(map(lambda x: x.get_clust_base_cnt(), self.clust_layers))
+
     def reset_clust_layer(self):
         for lay in self.clust_layers:
             lay.reset_clust_amt()

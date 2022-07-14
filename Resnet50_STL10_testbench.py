@@ -31,7 +31,7 @@ print('testing with normal model')
 accuracy, avg_loss = clustered.test(test_loader, model, loss_fn)
 
 clustering_test_results.append(','.join(map(str, [
-    *([0]*clust_layer_num), accuracy, avg_loss, *([0]*clust_layer_num)
+    *([0]*clust_layer_num), accuracy, avg_loss, *([0, 0]*clust_layer_num),
 ])))
 
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
         accuracy, avg_loss = clustered.test(test_loader, model, loss_fn)
 
         clustering_test_results.append(','.join(map(str, [
-            *testcase, accuracy, avg_loss, *model.get_clust_amt(),
+            *testcase, accuracy, avg_loss, *model.get_clust_amt(), *model.get_clust_base_cnt(),
         ])))
 
         with open(resultfile_path, 'wt') as file:
