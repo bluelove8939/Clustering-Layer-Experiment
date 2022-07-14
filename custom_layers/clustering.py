@@ -39,6 +39,7 @@ def set_logger(info=None, verbose=False):
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.shape
     img_reshaped = img.view(-1, cacheline_size)
+    clustered_masks = torch.zeros_like(img_reshaped).type(torch.bool)
     masks = torch.ones_like(img_reshaped)
 
     for idx in range(cacheline_size):
@@ -46,7 +47,9 @@ def cluster_img(img, threshold, cacheline_size):
         masks[:, idx] = 0
         sel_column = sel_column.repeat(cacheline_size, 1).transpose(0, 1)
         delta_masks = (torch.abs(img_reshaped - sel_column).le(threshold) * masks).type(torch.bool)
-        img_reshaped = torch.where(delta_masks == True, sel_column, img_reshaped)
+        img_reshaped = torch.where(torch.logical_and(delta_masks == True, clustered_masks == False),
+                                   sel_column, img_reshaped)
+        clustered_masks = torch.logical_or(clustered_masks, delta_masks)
 
     return torch.reshape(img_reshaped, img_shape)
 
