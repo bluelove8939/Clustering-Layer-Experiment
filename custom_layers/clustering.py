@@ -1,10 +1,12 @@
 import os
-import sys
 import logging
 import datetime
 
 import torch
 import torch.nn as nn
+
+from tools.training import test
+from tools.progressbar import progressbar
 
 
 if 'logs' not in os.listdir():
@@ -114,6 +116,41 @@ class QuantClusteringLayer(nn.Module):
 
     def string(self):
         return "Custom Layer: Clustering"
+
+
+class ClusteredModelOptimizer(object):
+    def __init__(self, tuning_dataloader, loss_fn):
+        self.tuning_dataloader = tuning_dataloader
+        self.loss_fn = loss_fn
+
+    def optimize_model(self, model, target_acc=100, thres_max=1, thres_min=0.001, max_iter=10, verbose=1):
+        thres = [thres_min] * len(model.clust_layers)
+
+        for tidx in reversed(range(len(thres))):
+            tmin = thres_min
+            tmax = thres_max
+
+            if verbose:
+                print(f"selecting thres[{tidx}]")
+                print(f"\r{progressbar(0, max_iter, scale=50)}  [{0:2d}/{max_iter:2d}]", end='')
+
+            for sidx in range(max_iter):
+                tcen = (tmax + tmin) / 2
+                thres[tidx] = tcen
+                model.set_clust_threshold(*thres)
+                model.reset_clust_layer()
+
+                acc, _ = test(self.tuning_dataloader, model, loss_fn=self.loss_fn, verbose=1)
+
+                if acc >= target_acc:
+                    tmin = tcen
+                else:
+                    tmax = tcen
+
+                if verbose:
+                    print(f"\r{progressbar(sidx + 1, max_iter, scale=50)}  [{sidx + 1:2d}/{max_iter:2d}]", end='')
+            if verbose:
+                print(f"\nselected threshold[{tidx}] = {thres[tidx]}\n")
 
 
 # if __name__ == '__main__':
