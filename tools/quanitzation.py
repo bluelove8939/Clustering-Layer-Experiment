@@ -12,10 +12,14 @@ class QuantizationModule(object):
         self.loss_fn = loss_fn
         self.optimizer = optimizer
 
-    def quantize(self, model, default_qconfig='fbgemm', calib=True, verbose=2):
+    def quantize(self, model, default_qconfig='fbgemm', calib=True, verbose=2, device="auto"):
+        if device == "auto":
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+
         print("\nQuantization Configs")
         print(f"- loss_fn: {self.loss_fn}")
         print(f"- qconfig: {default_qconfig}")
+        print(f"- device:  {device}")
 
         quant_model = copy.deepcopy(model)
         quant_model.eval()
@@ -26,11 +30,11 @@ class QuantizationModule(object):
         model_prepared = quantize_fx.prepare_fx(quant_model, qconfig_dict)
         if verbose: print(model_prepared)
 
-        if calib: self.calibrate(model_prepared, verbose=verbose)
+        if calib: self.calibrate(model_prepared, verbose=verbose, device=device)
         model_quantized = quantize_fx.convert_fx(model_prepared)
         return model_quantized
 
-    def calibrate(self, model, verbose=2):
+    def calibrate(self, model, verbose=2, device="auto"):
         if verbose == 1:
             print(f'\r{progressbar(0, len(self.tuning_dataloader), 50)}'
                   f'  calibration iter: {0:3d}/{len(self.tuning_dataloader):3d}', end='')
@@ -42,6 +46,7 @@ class QuantizationModule(object):
 
         with torch.no_grad():                             # do not save gradient when evaluation mode
             for image, target in self.tuning_dataloader:  # extract input and output data
+                image = image.to(device)
                 model(image)                              # forward propagation
 
                 if verbose == 1:
