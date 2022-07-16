@@ -56,3 +56,6 @@ class QuantizationModule(object):
                     print(f'calibration iter: {cnt:3d}/{len(self.tuning_dataloader):3d}', end='')
 
                 cnt += 1
+
+        if verbose == 1: print('\n')
+        elif verbose: print()
