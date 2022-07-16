@@ -41,4 +41,4 @@ opt_module.optimize_model(model, target_acc=accuracy, thres_max=1, thres_min=0.0
 clust_acc, clust_avg_loss = clustered.test(test_loader, model, loss_fn)
 print(f"target accuracy: {accuracy}   target avereage loss: {avg_loss}")
 print(f"clust accuracy:  {clust_acc}  clust average loss:   {clust_avg_loss}")
-print(f"selected thresholds: {', '.join(list(map(lambda x: x.threshold, model.clust_layers)))}")
+print(f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}', model.clust_layers)))}")

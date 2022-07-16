@@ -130,25 +130,26 @@ class ClusteredModelOptimizer(object):
             tmin = thres_min
             tmax = thres_max
 
-            if verbose:
-                print(f"selecting thres[{tidx}]")
-                print(f"\r{progressbar(0, max_iter, scale=50)}  [{0:2d}/{max_iter:2d}]", end='')
-
             for sidx in range(max_iter):
                 tcen = (tmax + tmin) / 2
                 thres[tidx] = tcen
                 model.set_clust_threshold(*thres)
                 model.reset_clust_layer()
 
+                if verbose:
+                    print(f"selecting thres[{tidx}] = {tcen}")
+
                 acc, _ = test(self.tuning_dataloader, model, loss_fn=self.loss_fn, verbose=1)
+
+                if verbose:
+                    print(f"clust amt: {', '.join(list(map(lambda x: f'{x:.4f}', model.get_clust_amt())))}")
+                    print(f"base cnt: {', '.join(list(map(lambda x: f'{x:.4f}', model.get_clust_base_cnt())))}")
 
                 if acc >= target_acc:
                     tmin = tcen
                 else:
                     tmax = tcen
 
-                if verbose:
-                    print(f"\r{progressbar(sidx + 1, max_iter, scale=50)}  [{sidx + 1:2d}/{max_iter:2d}]", end='')
             if verbose:
                 print(f"\nselected threshold[{tidx}] = {thres[tidx]}\n")
 
