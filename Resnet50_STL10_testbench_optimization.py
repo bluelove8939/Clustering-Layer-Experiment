@@ -21,7 +21,7 @@ total_datasize = len(clustered.train_dataset)
 valid_datasize = int(total_datasize)
 print(f"test dataset size: {valid_datasize}/{total_datasize}")
 tuning_dataset, _ = torch.utils.data.random_split(clustered.train_dataset, [valid_datasize, total_datasize-valid_datasize])
-tuning_loader = DataLoader(tuning_dataset, batch_size=10)
+tuning_loader = DataLoader(tuning_dataset, batch_size=128)
 loss_fn = clustered.loss_fn
 
 # Test with normal model as a reference
