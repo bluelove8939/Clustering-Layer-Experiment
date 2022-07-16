@@ -36,8 +36,9 @@ def set_logger(info=None, verbose=False):
     return logger
 
 
+@torch.fx.wrap
 def cluster_img(img, threshold, cacheline_size):
-    img_shape = img.shape
+    img_shape = img.size()
     img_reshaped = img.view(-1, cacheline_size)
     clustered_masks = torch.zeros_like(img_reshaped).type(torch.bool)
     masks = torch.ones_like(img_reshaped)
@@ -45,6 +46,8 @@ def cluster_img(img, threshold, cacheline_size):
     for idx in range(cacheline_size):
         sel_column = img_reshaped[:, idx]
         masks[:, idx] = 0
+        # masks_embed = masks[:, idx]
+        # masks_embed -= masks_embed
         sel_column = sel_column.repeat(cacheline_size, 1).transpose(0, 1)
         delta_masks = (torch.abs(img_reshaped - sel_column).le(threshold) * masks).type(torch.bool)
         img_reshaped = torch.where(torch.logical_and(delta_masks == True, clustered_masks == False),
@@ -95,6 +98,19 @@ class ClusteringLayer(nn.Module):
 
     def get_clust_base_cnt(self):
         return self._clust_base_cnt / self._clust_cnt
+
+    def string(self):
+        return "Custom Layer: Clustering"
+
+
+class QuantClusteringLayer(nn.Module):
+    def __init__(self, threshold=0, cacheline_size=64):
+        super(QuantClusteringLayer, self).__init__()
+        self.threshold = threshold
+        self.cacheline_size = cacheline_size
+
+    def forward(self, x):
+        return ClusteringFunction.apply(x, self.threshold, self.cacheline_size)
 
     def string(self):
         return "Custom Layer: Clustering"
