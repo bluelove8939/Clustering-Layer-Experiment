@@ -30,9 +30,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args, at_prune=False
         # measure data loading time
         data_time.update(time.time() - end)
 
-        if args.gpu is not None and at_prune is False:
-            images = images.cuda(args.gpu, non_blocking=True)
         if torch.cuda.is_available() and at_prune is False:
+            images = images.cuda(args.gpu, non_blocking=True)
             target = target.cuda(args.gpu, non_blocking=True)
 
         # compute output
@@ -64,9 +63,8 @@ def validate(val_loader, model, criterion, args):
             end = time.time()
             for i, (images, target) in enumerate(loader):
                 i = base_progress + i
-                if args.gpu is not None:
-                    images = images.cuda(args.gpu, non_blocking=True)
                 if torch.cuda.is_available():
+                    images = images.cuda(args.gpu, non_blocking=True)
                     target = target.cuda(args.gpu, non_blocking=True)
 
                 # compute output
