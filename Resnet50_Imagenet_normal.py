@@ -24,7 +24,7 @@ print(f"Using {device} device")
 
 
 # Dataset configuration
-dataset_dirname = os.path.join(os.path.abspath(os.sep), 'shared', 'Imagenet_data')
+dataset_dirname = args.data
 
 train_dataset = datasets.ImageFolder(
         os.path.join(dataset_dirname, 'train'),
