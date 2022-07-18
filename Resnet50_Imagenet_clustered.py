@@ -23,46 +23,29 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
 
 
-def get_mean(dataset):
-  meanRGB = [np.mean(image.numpy(), axis=(1,2)) for image,_ in dataset]
-  meanR = np.mean([m[0] for m in meanRGB])
-  meanG = np.mean([m[1] for m in meanRGB])
-  meanB = np.mean([m[2] for m in meanRGB])
-  return [meanR, meanG, meanB]
+# Dataset configuration
+dataset_dirname = args.data
 
-def get_std(dataset):
-  stdRGB = [np.std(image.numpy(), axis=(1,2)) for image,_ in dataset]
-  stdR = np.mean([s[0] for s in stdRGB])
-  stdG = np.mean([s[1] for s in stdRGB])
-  stdB = np.mean([s[2] for s in stdRGB])
-  return [stdR, stdG, stdB]
+train_dataset = datasets.ImageFolder(
+        os.path.join(dataset_dirname, 'train'),
+        transforms.Compose([
+            transforms.RandomResizedCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]))
 
-train_dataset = datasets.STL10(
-    root=os.path.join(os.curdir, '../data'),
-    split='train',
-    download=True,
-    transform=transforms.ToTensor()
-)
+test_dataset = datasets.ImageFolder(
+        os.path.join(dataset_dirname, 'val'),
+        transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ]))
 
-test_dataset = datasets.STL10(
-    root=os.path.join(os.curdir, '../data'),
-    split='test',
-    download=True,
-    transform=transforms.ToTensor()
-)
-
-train_transforms = transforms.Compose([transforms.Resize((128, 128)),
-                                       transforms.ToTensor(),
-                                       transforms.Normalize(get_mean(train_dataset), get_std(train_dataset))])
-test_transforms = transforms.Compose([transforms.Resize((128, 128)),
-                                      transforms.ToTensor(),
-                                      transforms.Normalize(get_mean(test_dataset), get_std(test_dataset))])
-
-train_dataset.transforms = train_transforms
-test_dataset.transforms = test_transforms
-
-train_loader = DataLoader(train_dataset, batch_size=128, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=64, shuffle=True)
+train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True)
+test_loader = DataLoader(test_dataset, batch_size=256, shuffle=False)
 
 
 # Customize pretrained reference model
