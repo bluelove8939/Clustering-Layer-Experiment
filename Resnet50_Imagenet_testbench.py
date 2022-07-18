@@ -20,10 +20,10 @@ thresholds = [0.1, 0.08, 0.05, 0.02, 0.01, 0.005]
 clustering_test_results = []
 
 # Test dataset generation
-total_datasize = len(clustered.test_dataset)
+total_datasize = len(clustered.train_dataset)
 valid_datasize = int(total_datasize / 16)
 print(f"test dataset size: {valid_datasize}/{total_datasize}")
-test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
+test_dataset, _ = torch.utils.data.random_split(clustered.train_dataset, [valid_datasize, total_datasize-valid_datasize])
 test_loader = DataLoader(test_dataset, batch_size=10)
 loss_fn = clustered.loss_fn
 
