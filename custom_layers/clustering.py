@@ -126,9 +126,9 @@ class ClusteredModelOptimizer(object):
     def optimize_model(self, model, target_acc=100, thres_max=1, thres_min=0.001, max_iter=10, verbose=1):
         print("\nOptimization Config")
         print(f"- target_acc: {target_acc}")
-        print(f"- target_acc: {thres_max}")
-        print(f"- target_acc: {thres_min}")
-        print(f"- target_acc: {max_iter}")
+        print(f"- thres_max: {thres_max}")
+        print(f"- thres_min: {thres_min}")
+        print(f"- max_iter: {max_iter}")
 
         thres = [thres_min] * len(model.clust_layers)
 

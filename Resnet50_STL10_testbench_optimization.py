@@ -35,10 +35,17 @@ accuracy, avg_loss = clustered.test(tuning_loader, model, loss_fn)
 opt_module = ClusteredModelOptimizer(tuning_loader, loss_fn=loss_fn)
 model = clustered.model
 model.load_state_dict(torch.load(normal.save_fullpath))
-opt_module.optimize_model(model, target_acc=accuracy, thres_max=1, thres_min=0.001, max_iter=10, verbose=1)
+opt_module.optimize_model(model, target_acc=accuracy, thres_max=1, thres_min=0.001, max_iter=20, verbose=1)
 
-# Print test results
+# Print test results and save result as text file
 clust_acc, clust_avg_loss = clustered.test(tuning_loader, model, loss_fn)
 print(f"target accuracy: {accuracy}  target avereage loss: {avg_loss:.4f}")
 print(f"clust accuracy:  {clust_acc}  clust average loss:   {clust_avg_loss:.4f}")
 print(f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}', model.clust_layers)))}")
+
+with open(resultfile_path, 'wt') as file:
+    file.writelines([
+        f"target accuracy: {accuracy}  target avereage loss: {avg_loss:.4f}",
+        f"clust accuracy:  {clust_acc}  clust average loss:   {clust_avg_loss:.4f}",
+        f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}', model.clust_layers)))}"
+    ])
