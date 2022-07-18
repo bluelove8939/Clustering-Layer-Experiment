@@ -46,7 +46,7 @@ print(f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}',
 
 with open(resultfile_path, 'wt') as file:
     file.writelines([
-        f"target accuracy: {accuracy}  target avereage loss: {avg_loss:.4f}",
-        f"clust accuracy:  {clust_acc}  clust average loss:   {clust_avg_loss:.4f}",
-        f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}', model.clust_layers)))}"
+        f"target accuracy: {accuracy}  target avereage loss: {avg_loss:.4f}\n",
+        f"clust accuracy:  {clust_acc}  clust average loss:   {clust_avg_loss:.4f}\n",
+        f"selected thresholds: {', '.join(list(map(lambda x: f'{x.threshold:.4f}', model.clust_layers)))}\n"
     ])
