@@ -132,11 +132,11 @@ class ClusteredModelOptimizer(object):
 
         thres = [thres_min] * len(model.clust_layers)
 
-        for tidx in range(len(thres)):
+        for tidx in reversed(range(len(thres))):
             tmin = thres_min
             tmax = thres_max
 
-            for sidx in reversed(range(max_iter)):
+            for sidx in range(max_iter):
                 tcen = (tmax + tmin) / 2
                 thres[tidx] = tcen
                 model.set_clust_threshold(*thres)
