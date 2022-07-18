@@ -180,12 +180,18 @@ def show_activations(model, channel_size=9):
 
 
 if __name__ == '__main__':
-    epoch = 5
-    train(train_loader, model, loss_fn, optimizer, epoch, args)
-    validate(test_loader, model, loss_fn, args)
+    import Resnet50_Imagenet_normal as normal
+    model.load_state_dict(torch.load(normal.save_fullpath))
+    model.set_clust_threshold(0.01, 0.05, 0.02, 0.02, 0.1)
+    model.reset_clust_layer()
 
-    if 'model_output' not in os.listdir(os.curdir):
-        os.mkdir(os.path.join(os.curdir, 'model_output'))
-    torch.save(model.state_dict(), save_fullpath)
+    epoch = 5
+    # train(train_loader, model, loss_fn, optimizer, epoch, args)
+    validate(test_loader, model, loss_fn, args)
+    print(f"clust_amt:  {model.get_clust_amt()}")
+    print(f"clust_base: {model.get_clust_base_cnt()}")
+    # if 'model_output' not in os.listdir(os.curdir):
+    #     os.mkdir(os.path.join(os.curdir, 'model_output'))
+    # torch.save(model.state_dict(), save_fullpath)
 
     # show_activations(model, channel_size=9)
