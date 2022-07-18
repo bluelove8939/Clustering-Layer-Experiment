@@ -116,7 +116,7 @@ def show_activations(model, channel_size=9):
 
 if __name__ == '__main__':
     epoch = 5
-    train(train_loader, model, loss_fn, optimizer, epoch, args)
+    # train(train_loader, model, loss_fn, optimizer, epoch, args)
     validate(test_loader, model, loss_fn, args)
 
     if 'model_output' not in os.listdir(os.curdir):
