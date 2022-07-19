@@ -38,7 +38,7 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
-def train(dataloader, model, loss_fn, optimizer, verbose=2):
+def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None):
     size = len(dataloader.dataset)  # size of the dataset
     lossmeter = AverageMeter('loss', fmt=':.4f')
 
@@ -66,10 +66,15 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
             sys.stdout.write(f"train status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
                              f"{lossmeter}  [{current:>5d}/{size:>5d}]\n")
 
+    if savelog_path is not None:
+        with open(savelog_path, 'at') as logfile:
+            logfile.write(f"train status: {progressbar(size, size, scale=50)} 100%  "
+                          f"{lossmeter}  [{size:>5d}/{size:>5d}]\n")
+
     if verbose == 1: print('')
 
 
-def test(dataloader, model, loss_fn, verbose=2):
+def test(dataloader, model, loss_fn, verbose=2, savelog_path=None):
     size = len(dataloader.dataset)  # dataset size
     num_batches = len(dataloader)   # the number of batches
     model.eval()                    # convert model into evaluation mode
@@ -94,5 +99,9 @@ def test(dataloader, model, loss_fn, verbose=2):
     if verbose:
         if verbose == 1: print()
         print(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}")
+
+    if savelog_path is not None:
+        with open(savelog_path, 'at') as logfile:
+            logfile.write(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}\n")
 
     return 100 * correct, test_loss
