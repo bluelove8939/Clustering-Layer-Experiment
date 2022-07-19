@@ -1,3 +1,4 @@
+import sys
 import torch
 from tools.progressbar import progressbar
 
@@ -25,11 +26,11 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         loss, current = loss.item(), (batch+1) * dataloader.batch_size
 
         if verbose == 1:
-            print(f"\rtrain status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
-                  f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]", end="")
+            sys.stdout.write(f"\rtrain status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
+                             f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
         elif verbose:
-            print(f"train status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
-                  f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
+            sys.stdout.write(f"train status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
+                             f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]\n")
 
     if verbose == 1: print('')
 
