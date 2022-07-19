@@ -34,8 +34,8 @@ transformer = transforms.Compose([transforms.Resize((32, 32)),
 train_dataset = datasets.CIFAR10(root='../data', train=True, download=True, transform=transformer)
 test_dataset = datasets.CIFAR10(root='../data', train=False, download=True, transform=transformer)
 
-train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=100, shuffle=True)
-test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=100, shuffle=False)
+train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=200, shuffle=True)
+test_loader = torch.utils.data.DataLoader(dataset=test_dataset, batch_size=200, shuffle=False)
 
 
 # Model configs
