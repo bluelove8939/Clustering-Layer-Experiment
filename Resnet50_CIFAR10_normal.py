@@ -151,6 +151,7 @@ if __name__ == '__main__':
             if args.save_log:
                 with open(logs_path, 'at') as logfile:
                     logfile.write(f"\nEpoch: {eidx}\n")
+            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1, savelog_path=logs_path)
             scheduler.step()
             torch.save(model.state_dict(), save_fullpath)
     else:
