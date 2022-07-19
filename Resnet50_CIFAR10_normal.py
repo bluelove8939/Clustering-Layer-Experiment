@@ -58,7 +58,7 @@ model_type = 'normal'
 model = torchvision.models.resnet50().to(device)
 
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=5e-4)
-# scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 loss_fn = nn.CrossEntropyLoss().to(device)
 
 save_dirpath = os.path.join(os.curdir, 'model_output')
@@ -135,7 +135,7 @@ if __name__ == '__main__':
         for eidx in range(epoch):
             print(f"\nEpoch: {eidx}")
             train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
-            # scheduler.step()
+            scheduler.step()
             torch.save(model.state_dict(), save_fullpath)
     else:
         print('- skip training: True')
