@@ -90,6 +90,7 @@ pmodule = PruneModule(train_loader, loss_fn=loss_fn, optimizer=optimizer)
 
 # Model Saving Configs
 save_dirpath = os.path.join(os.curdir, 'model_output')
+save_fullpath_normal = f"Resnet50_STL10_normal.pth"
 if not os.path.exists(save_dirpath):
     os.makedirs(save_dirpath)
 
@@ -161,7 +162,7 @@ if __name__ == '__main__':
     else:
         print("skip training and load saved state dict")
         print(f"state dict: {save_fullpath(pamount=prune_amount)}")
-        model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
+        model.load_state_dict(torch.load(save_fullpath_normal))
 
     threshold = args.thres
     step = args.step
