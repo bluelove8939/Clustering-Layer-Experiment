@@ -113,7 +113,7 @@ def validate(val_loader, model, criterion, args):
 
     progress.display_summary()
 
-    return top1.avg
+    return top1.avg, losses.avg
 
 
 class Summary(Enum):
