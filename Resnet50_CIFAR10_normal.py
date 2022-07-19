@@ -45,6 +45,7 @@ model = torchvision.models.resnet50().to(device)
 
 lr = 0.1
 optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 loss_fn = nn.CrossEntropyLoss().to(device)
 
 save_dirpath = os.path.join(os.curdir, 'model_output')
@@ -106,10 +107,11 @@ def show_activations(model, channel_size=9):
 
 
 if __name__ == '__main__':
-    epoch = 5
+    epoch = 100
     for eidx in range(epoch):
         print(f"\nEpoch: {eidx}")
         train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
+        scheduler.step()
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     if 'model_output' not in os.listdir(os.curdir):
