@@ -25,6 +25,8 @@ parser.add_argument('--resume', default=False, action='store_true',
                     help='resume with the stored state dict (bool)')
 parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
+parser.add_argument('--save-log', default=False, action='store_true',
+                    help='saves log (bool)')
 parser.add_argument('-e', '--epoch', default=100, type=int,
                     help='number of epoch (int)')
 parser.add_argument('-lr', '--learning-rate', dest='lr', default=0.1, type=float,
@@ -128,13 +130,14 @@ if __name__ == '__main__':
     epoch = args.epoch
     logs_path = os.path.join(os.curdir, 'logs', 'Resnet50_CIFAR10_normal.log')
 
-    with open(logs_path, 'wt') as logfile:
-        logfile.write('test config\n')
-        if not args.skip_training:
-            logfile.write(f'- epoch: {epoch}\n')
-            logfile.write(f'- resume: {args.resume}\n')
-        else:
-            logfile.write('- skip training: True')
+    if args.save_log:
+        with open(logs_path, 'wt') as logfile:
+            logfile.write('test config\n')
+            if not args.skip_training:
+                logfile.write(f'- epoch: {epoch}\n')
+                logfile.write(f'- resume: {args.resume}\n')
+            else:
+                logfile.write('- skip training: True')
 
     print('\ntest config')
     print(f'- save path: {save_fullpath}')
@@ -145,7 +148,9 @@ if __name__ == '__main__':
 
         for eidx in range(epoch):
             print(f"\nEpoch: {eidx}")
-            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1, savelog_path=logs_path)
+            if args.save_log:
+                with open(logs_path, 'at') as logfile:
+                    logfile.write(f"\nEpoch: {eidx}\n")
             scheduler.step()
             torch.save(model.state_dict(), save_fullpath)
     else:
