@@ -26,6 +26,8 @@ parser.add_argument('--thres', action='store' , type=float, default=1,
                     help="accuracy threshold value (difference between normal accyracy and pruned model accyracy, "
                          "percent scale)")
 parser.add_argument('--tuneiter', action='store' , type=int, default=5, help="fine tuning maximum iteration value")
+parser.add_argument('--skip-training', default=False, action='store_true',
+                    help='skips training (bool)')
 args = parser.parse_args()
 
 
@@ -151,10 +153,15 @@ def show_activations(model, channel_size=9):
 
 if __name__ == '__main__':
     epoch = 5
-    for eidx in range(epoch):
-        print(f"\nEpoch: {eidx}")
-        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
-    test(test_loader, model, loss_fn=loss_fn, verbose=1)
+    if not args.skip_training:
+        for eidx in range(epoch):
+            print(f"\nEpoch: {eidx}")
+            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
+        test(test_loader, model, loss_fn=loss_fn, verbose=1)
+    else:
+        print("skip training and load saved state dict")
+        print(f"state dict: {save_fullpath(pamount=prune_amount)}")
+        model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
 
     threshold = args.thres
     step = args.step
