@@ -1,5 +1,7 @@
 import sys
 import torch
+import torch.distributed as dist
+from enum import Enum
 from tools.progressbar import progressbar
 
 
@@ -7,8 +9,39 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
 
 
+class AverageMeter(object):
+    def __init__(self, name, fmt=':f'):
+        self.name = name
+        self.fmt = fmt
+        self.reset()
+
+    def reset(self):
+        self.val = 0
+        self.avg = 0
+        self.sum = 0
+        self.count = 0
+
+    def update(self, val, n=1):
+        self.val = val
+        self.sum += val * n
+        self.count += n
+        self.avg = self.sum / self.count
+
+    def all_reduce(self):
+        total = torch.FloatTensor([self.sum, self.count])
+        dist.all_reduce(total, dist.ReduceOp.SUM, async_op=False)
+        self.sum, self.count = total.tolist()
+        self.avg = self.sum / self.count
+
+    def __str__(self):
+        fmtstr = '{name} {val' + self.fmt + '} ({avg' + self.fmt + '})'
+        return fmtstr.format(**self.__dict__)
+
+
 def train(dataloader, model, loss_fn, optimizer, verbose=2):
     size = len(dataloader.dataset)  # size of the dataset
+    lossmeter = AverageMeter('loss', fmt=':.4f')
+
     model.train()                   # turn the model into train mode
     for batch, (X, y) in enumerate(dataloader):  # each index of dataloader will be batch index
         X, y = X.to(device), y.to(device)        # extract input and output
@@ -24,13 +57,14 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2):
         optimizer.step()       # update parameters
 
         loss, current = loss.item(), (batch+1) * dataloader.batch_size
+        lossmeter.update(loss, dataloader.batch_size)
 
         if verbose == 1:
             sys.stdout.write(f"\rtrain status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
-                             f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]")
+                             f"{lossmeter} [{current:>5d}/{size:>5d}]")
         elif verbose:
             sys.stdout.write(f"train status: {progressbar(current, size, scale=50)} {current / size * 100:3.0f}%  "
-                             f"loss: {loss:>7.4f}  [{current:>5d}/{size:>5d}]\n")
+                             f"{lossmeter}  [{current:>5d}/{size:>5d}]\n")
 
     if verbose == 1: print('')
 
