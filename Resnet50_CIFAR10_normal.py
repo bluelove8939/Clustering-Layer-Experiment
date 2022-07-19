@@ -124,25 +124,36 @@ if __name__ == '__main__':
         os.mkdir(os.path.join(os.curdir, 'model_output'))
     if args.resume or args.skip_training:
         model.load_state_dict(torch.load(save_fullpath))
+
     epoch = args.epoch
+    logs_path = os.path.join(os.curdir, 'logs', 'Resnet50_CIFAR10_normal.log')
+
+    with open(logs_path, 'wt') as logfile:
+        logfile.write('test config\n')
+        if not args.skip_training:
+            logfile.write(f'- epoch: {epoch}')
+            logfile.write(f'- resume: {args.resume}')
+        else:
+            logfile.write('- skip training: True')
 
     print('\ntest config')
     print(f'- save path: {save_fullpath}')
+    print(f'- logs path: {logs_path}')
     if not args.skip_training:
         print(f'- epoch: {epoch}')
         print(f'- resume: {args.resume}')
 
         for eidx in range(epoch):
             print(f"\nEpoch: {eidx}")
-            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
+            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1, savelog_path=logs_path)
             scheduler.step()
             torch.save(model.state_dict(), save_fullpath)
     else:
         print('- skip training: True')
 
     print('\nValidation test with trainset')
-    test(train_loader, model, loss_fn=loss_fn, verbose=1)
+    test(train_loader, model, loss_fn=loss_fn, verbose=1, savelog_path=logs_path)
     print('\nValidation test with testset')
-    test(test_loader, model, loss_fn=loss_fn, verbose=1)
+    test(test_loader, model, loss_fn=loss_fn, verbose=1, savelog_path=logs_path)
 
     # show_activations(model, channel_size=9)
