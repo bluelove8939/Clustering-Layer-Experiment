@@ -117,6 +117,8 @@ def show_activations(model, channel_size=9):
 
 
 if __name__ == '__main__':
+    if 'model_output' not in os.listdir(os.curdir):
+        os.mkdir(os.path.join(os.curdir, 'model_output'))
     if args.resume or args.skip_training:
         model.load_state_dict(torch.load(save_fullpath))
     epoch = args.epoch
@@ -132,12 +134,10 @@ if __name__ == '__main__':
             train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
             # scheduler.step()
             torch.save(model.state_dict(), save_fullpath)
-        test(test_loader, model, loss_fn=loss_fn, verbose=1)
     else:
         print('- skip training: True')
 
-    if 'model_output' not in os.listdir(os.curdir):
-        os.mkdir(os.path.join(os.curdir, 'model_output'))
+    test(test_loader, model, loss_fn=loss_fn, verbose=1)
     torch.save(model.state_dict(), save_fullpath)
 
     # show_activations(model, channel_size=9)
