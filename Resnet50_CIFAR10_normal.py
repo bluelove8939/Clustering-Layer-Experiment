@@ -22,6 +22,7 @@ ssl._create_default_https_context = ssl._create_unverified_context
 import argparse
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
 parser.add_argument('--resume', default=False, type=bool, help='resume with the stored state dict (bool)')
+parser.add_argument('--skip-training', default=False, type=bool, help='skips training (bool)')
 parser.add_argument('--epoch', default=100, type=int, help='number of epoch (int)')
 args = parser.parse_args()
 
@@ -113,21 +114,24 @@ def show_activations(model, channel_size=9):
 
 
 if __name__ == '__main__':
-    if args.resume:
+    if args.resume or args.skip_training:
         model.load_state_dict(torch.load(save_fullpath))
     epoch = args.epoch
 
     print('\ntest config')
     print(f'- save path: {save_fullpath}')
-    print(f'- epoch: {epoch}')
-    print(f'- resume: {args.resume}')
+    if not args.skip_training:
+        print(f'- epoch: {epoch}')
+        print(f'- resume: {args.resume}')
 
-    for eidx in range(epoch):
-        print(f"\nEpoch: {eidx}")
-        train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
-        # scheduler.step()
-        torch.save(model.state_dict(), save_fullpath)
-    test(test_loader, model, loss_fn=loss_fn, verbose=1)
+        for eidx in range(epoch):
+            print(f"\nEpoch: {eidx}")
+            train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
+            # scheduler.step()
+            torch.save(model.state_dict(), save_fullpath)
+        test(test_loader, model, loss_fn=loss_fn, verbose=1)
+    else:
+        print('- skip training: True')
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
