@@ -21,9 +21,9 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 import argparse
 parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
-parser.add_argument('--resume', default=False, type=bool, action='store_true',
+parser.add_argument('--resume', default=False, action='store_true',
                     help='resume with the stored state dict (bool)')
-parser.add_argument('--skip-training', default=False, type=bool, action='store_true',
+parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
 parser.add_argument('--epoch', default=100, type=int,
                     help='number of epoch (int)')
