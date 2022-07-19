@@ -46,7 +46,7 @@ test_dataset = datasets.ImageFolder(
 
 if args.distributed:
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
-    val_sampler = torch.utils.data.distributed.DistributedSampler(val_dataset, shuffle=False, drop_last=True)
+    val_sampler = torch.utils.data.distributed.DistributedSampler(test_dataset, shuffle=False, drop_last=True)
 else:
     train_sampler = None
     val_sampler = None
