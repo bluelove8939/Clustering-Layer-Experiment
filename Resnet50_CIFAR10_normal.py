@@ -117,7 +117,7 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(save_fullpath))
     epoch = args.epoch
 
-    print('test config')
+    print('\ntest config')
     print(f'- save path: {save_fullpath}')
     print(f'- epoch: {epoch}')
     print(f'- resume: {args.resume}')
