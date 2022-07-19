@@ -43,9 +43,8 @@ class PruneModule(object):
         print(f"- max_iter: {max_iter}")
         print(f"- pass_normal: {pass_normal}")
 
-
         if not pass_normal:
-            print("testing normal model...")
+            print("\ntesting normal model...")
             normal_acc, normal_avg_loss = test(self.tuning_dataloader, model, loss_fn=self.loss_fn, verbose=verbose)
             print(f"normal model test result: acc({normal_acc:.4f}) avg_loss({normal_avg_loss:.4f})")
         else:
