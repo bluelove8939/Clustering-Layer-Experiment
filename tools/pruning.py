@@ -15,9 +15,9 @@ class PruneModule(object):
         for sub_idx, sub_module in module._modules.items():
             if isinstance(sub_module, torch.nn.Conv2d):
                 prune.remove(sub_module, 'weight')
-            elif isinstance(sub_module, torch.nn.Linear) or isinstance(sub_module, torch.nn.BatchNorm2d):
-                prune.remove(sub_module, 'weight')
-                prune.remove(sub_module, 'bias')
+            # elif isinstance(sub_module, torch.nn.Linear) or isinstance(sub_module, torch.nn.BatchNorm2d):
+            #     prune.remove(sub_module, 'weight')
+            #     prune.remove(sub_module, 'bias')
             elif isinstance(sub_module, torch.nn.Module):
                 self.remove_prune_model(sub_module)
 
@@ -26,10 +26,10 @@ class PruneModule(object):
             if isinstance(sub_module, torch.nn.Conv2d):
                 # print(sub_idx, 'Conv2d')
                 prune.l1_unstructured(sub_module, 'weight', amount=step)
-            elif isinstance(sub_module, torch.nn.Linear) or isinstance(sub_module, torch.nn.BatchNorm2d):
-                # print(sub_idx, 'Linear')
-                prune.l1_unstructured(sub_module, 'weight', amount=step)
-                prune.l1_unstructured(sub_module, 'bias', amount=step)
+            # elif isinstance(sub_module, torch.nn.Linear) or isinstance(sub_module, torch.nn.BatchNorm2d):
+            #     # print(sub_idx, 'Linear')
+            #     prune.l1_unstructured(sub_module, 'weight', amount=step)
+            #     prune.l1_unstructured(sub_module, 'bias', amount=step)
             elif isinstance(sub_module, torch.nn.Module):
                 # print(f"Entering layer[{sub_idx}]: {sub_module._get_name()}")
                 self.prune_layer(sub_module, step)
