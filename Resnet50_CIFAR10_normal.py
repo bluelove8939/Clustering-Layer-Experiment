@@ -131,8 +131,8 @@ if __name__ == '__main__':
     with open(logs_path, 'wt') as logfile:
         logfile.write('test config\n')
         if not args.skip_training:
-            logfile.write(f'- epoch: {epoch}')
-            logfile.write(f'- resume: {args.resume}')
+            logfile.write(f'- epoch: {epoch}\n')
+            logfile.write(f'- resume: {args.resume}\n')
         else:
             logfile.write('- skip training: True')
 
