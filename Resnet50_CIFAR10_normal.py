@@ -11,7 +11,6 @@ import torchvision.transforms as transforms
 import torchvision.datasets as datasets
 
 import numpy as np
-
 import matplotlib.pyplot as plt
 
 from tools.training import test, train
@@ -19,6 +18,12 @@ from tools.progressbar import progressbar
 
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context
+
+import argparse
+parser = argparse.ArgumentParser(description='PyTorch CIFAR10 Training')
+parser.add_argument('--resume', default=False, type=bool, help='resume with the stored state dict(bool)')
+args = parser.parse_args()
+
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using {device} device")
@@ -107,11 +112,15 @@ def show_activations(model, channel_size=9):
 
 
 if __name__ == '__main__':
+    if args.resume:
+        model.load_state_dict(torch.load(save_fullpath))
+
     epoch = 100
     for eidx in range(epoch):
         print(f"\nEpoch: {eidx}")
         train(train_loader, model, loss_fn=loss_fn, optimizer=optimizer, verbose=1)
         # scheduler.step()
+        torch.save(model.state_dict(), save_fullpath)
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     if 'model_output' not in os.listdir(os.curdir):
