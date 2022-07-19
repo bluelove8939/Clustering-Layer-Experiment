@@ -20,12 +20,14 @@ thresholds = [0.1, 0.08, 0.05, 0.02, 0.01, 0.005]
 clustering_test_results = []
 
 # Test dataset generation
-# total_datasize = len(clustered.test_dataset)
-# valid_datasize = int(total_datasize / 100)
-# print(f"test dataset size: {valid_datasize}/{total_datasize}")
-# test_dataset, _ = torch.utils.data.random_split(clustered.train_dataset, [valid_datasize, total_datasize-valid_datasize])
-# test_loader = DataLoader(test_dataset, batch_size=10)
-test_loader = clustered.test_loader
+total_datasize = len(clustered.train_dataset)
+valid_datasize = int(total_datasize / 100)
+print(f"test dataset size: {valid_datasize}/{total_datasize}")
+test_dataset, _ = torch.utils.data.random_split(clustered.train_dataset, [valid_datasize, total_datasize-valid_datasize])
+test_loader = torch.utils.data.DataLoader(
+    test_dataset, batch_size=args.batch_size, shuffle=False,
+    num_workers=args.workers, pin_memory=True, sampler=clustered.val_sampler)
+# test_loader = clustered.test_loader
 loss_fn = clustered.loss_fn
 
 # Test with normal model as a reference
