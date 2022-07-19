@@ -59,6 +59,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args, at_prune=False
 
 def validate(val_loader, model, criterion, args):
     def run_validate(loader, base_progress=0):
+        print("run_validate called")
         with torch.no_grad():
             end = time.time()
             for i, (images, target) in enumerate(loader):
@@ -102,6 +103,7 @@ def validate(val_loader, model, criterion, args):
         top5.all_reduce()
 
     if args.distributed and (len(val_loader.sampler) * args.world_size < len(val_loader.dataset)):
+        print("distributed")
         aux_val_dataset = Subset(val_loader.dataset,
                                  range(len(val_loader.sampler) * args.world_size, len(val_loader.dataset)))
         aux_val_loader = torch.utils.data.DataLoader(

@@ -86,6 +86,5 @@ if args.dist_url == "env://" and args.world_size == -1:
     args.world_size = int(os.environ["WORLD_SIZE"])
 
 args.distributed = args.world_size > 1 or args.multiprocessing_distributed
-print(args.distributed)
 
 ngpus_per_node = torch.cuda.device_count()
