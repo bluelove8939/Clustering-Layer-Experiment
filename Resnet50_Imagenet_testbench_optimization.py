@@ -19,7 +19,7 @@ clustering_test_results = []
 
 # Test dataset generation
 total_datasize = len(clustered.train_dataset)
-valid_datasize = int(total_datasize / 50)
+valid_datasize = int(total_datasize / 1000)
 print(f"test dataset size: {valid_datasize}/{total_datasize}")
 tuning_dataset, _ = torch.utils.data.random_split(clustered.train_dataset, [valid_datasize, total_datasize-valid_datasize])
 tuning_loader = DataLoader(tuning_dataset, batch_size=128)
