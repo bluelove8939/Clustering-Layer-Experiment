@@ -97,17 +97,17 @@ def validate(val_loader, model, criterion, args):
     model.eval()
 
     run_validate(val_loader)
-    if args.distributed:
-        top1.all_reduce()
-        top5.all_reduce()
-
-    if args.distributed and (len(val_loader.sampler) * args.world_size < len(val_loader.dataset)):
-        aux_val_dataset = Subset(val_loader.dataset,
-                                 range(len(val_loader.sampler) * args.world_size, len(val_loader.dataset)))
-        aux_val_loader = torch.utils.data.DataLoader(
-            aux_val_dataset, batch_size=args.batch_size, shuffle=False,
-            num_workers=args.workers, pin_memory=True)
-        run_validate(aux_val_loader, len(val_loader))
+    # if args.distributed:
+    #     top1.all_reduce()
+    #     top5.all_reduce()
+    #
+    # if args.distributed and (len(val_loader.sampler) * args.world_size < len(val_loader.dataset)):
+    #     aux_val_dataset = Subset(val_loader.dataset,
+    #                              range(len(val_loader.sampler) * args.world_size, len(val_loader.dataset)))
+    #     aux_val_loader = torch.utils.data.DataLoader(
+    #         aux_val_dataset, batch_size=args.batch_size, shuffle=False,
+    #         num_workers=args.workers, pin_memory=True)
+    #     run_validate(aux_val_loader, len(val_loader))
 
     progress.display_summary()
 
