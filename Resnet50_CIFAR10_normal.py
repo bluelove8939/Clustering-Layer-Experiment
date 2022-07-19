@@ -140,7 +140,9 @@ if __name__ == '__main__':
     else:
         print('- skip training: True')
 
+    print('\nValidation test with trainset')
+    test(train_loader, model, loss_fn=loss_fn, verbose=1)
+    print('\nValidation test with testset')
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
-    torch.save(model.state_dict(), save_fullpath)
 
     # show_activations(model, channel_size=9)
