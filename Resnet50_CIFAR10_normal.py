@@ -25,8 +25,12 @@ parser.add_argument('--resume', default=False, action='store_true',
                     help='resume with the stored state dict (bool)')
 parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
-parser.add_argument('--epoch', default=100, type=int,
+parser.add_argument('-e', '--epoch', default=100, type=int,
                     help='number of epoch (int)')
+parser.add_argument('-lr', '--learning-rate', dest='lr', default=0.1, type=float,
+                    help='learning rate (float)')
+parser.add_argument('-m', '--momentum', dest='momentum', default=0.9, type=float,
+                    help='learning rate (float)')
 args = parser.parse_args()
 
 
@@ -53,8 +57,7 @@ model_name = 'Resnet50'
 model_type = 'normal'
 model = torchvision.models.resnet50().to(device)
 
-lr = 0.1
-optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=5e-4)
 # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=200)
 loss_fn = nn.CrossEntropyLoss().to(device)
 
