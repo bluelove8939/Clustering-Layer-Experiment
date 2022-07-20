@@ -189,7 +189,7 @@ if __name__ == '__main__':
 
     # Quantizing model
     qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1)
-    test(test_loader, qmodel, loss_fn=loss_fn, verbose=1)
+    test(test_loader, qmodel, loss_fn=loss_fn, verbose=1, tdevice='cpu')
 
     # Extract output activations
     qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized", device='cpu')
