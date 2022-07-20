@@ -29,6 +29,8 @@ parser.add_argument('--thres', action='store' , type=float, default=1,
 parser.add_argument('--tuneiter', action='store' , type=int, default=5, help="fine tuning maximum iteration value")
 parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
+parser.add_argument('--skip-pruning', default=False, action='store_true',
+                    help='skips training (bool)')
 args = parser.parse_args()
 
 
@@ -166,18 +168,24 @@ if __name__ == '__main__':
         test(test_loader, model, loss_fn=loss_fn, verbose=1)
     else:
         print("skip training and load saved state dict")
-        print(f"state dict: {save_fullpath(pamount=prune_amount)}")
+        print(f"state dict: {save_fullpath_normal}")
         model.load_state_dict(torch.load(save_fullpath_normal))
 
     # Pruning model
-    threshold = args.thres
-    step = args.step
-    max_iter = args.tuneiter
+    if not args.skip_pruning:
+        threshold = args.thres
+        step = args.step
+        max_iter = args.tuneiter
 
-    pmodule.prune_model(model, target_amount=prune_amount, threshold=threshold, step=step, max_iter=max_iter,
-                        pass_normal=False, verbose=1)
-    pmodule.remove_prune_model(model)
-    test(test_loader, model, loss_fn=loss_fn, verbose=1)
+        pmodule.prune_model(model, target_amount=prune_amount, threshold=threshold, step=step, max_iter=max_iter,
+                            pass_normal=False, verbose=1)
+        pmodule.remove_prune_model(model)
+        test(test_loader, model, loss_fn=loss_fn, verbose=1)
+        torch.save(model.state_dict(), save_fullpath(pamount=prune_amount))
+    else:
+        print("skip training and load saved state dict")
+        print(f"state dict: {save_fullpath(pamount=prune_amount)}")
+        model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
 
     # Quantizing model
     qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1, device="auto")
