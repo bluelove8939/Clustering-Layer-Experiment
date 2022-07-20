@@ -38,7 +38,10 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
-def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None):
+def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, tdevice='auto'):
+    if tdevice != 'auto':
+        device = tdevice
+
     size = len(dataloader.dataset)  # size of the dataset
     lossmeter = AverageMeter('loss', fmt=':.4f')
 
@@ -74,7 +77,10 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None):
     if verbose == 1: print('')
 
 
-def test(dataloader, model, loss_fn, verbose=2, savelog_path=None):
+def test(dataloader, model, loss_fn, verbose=2, savelog_path=None, tdevice='auto'):
+    if tdevice != 'auto':
+        device = tdevice
+
     size = len(dataloader.dataset)  # dataset size
     num_batches = len(dataloader)   # the number of batches
     model.eval()                    # convert model into evaluation mode
