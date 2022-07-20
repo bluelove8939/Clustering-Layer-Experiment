@@ -189,8 +189,7 @@ if __name__ == '__main__':
 
     # Quantizing model
     qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1)
-    qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized",
-                                         savepath=None, device='cpu')
+    qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized", device='cpu')
     qextractor.add_trace('conv')
     qextractor.add_trace('conv1')
     qextractor.add_trace('conv2')
@@ -200,7 +199,7 @@ if __name__ == '__main__':
     qextractor.add_trace('fc')
     qextractor.extract_activations(test_loader, max_iter=5)
     qextractor.extract_parameters()
-    qextractor.save_features()
+    qextractor.save_features(savepath=None)
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
