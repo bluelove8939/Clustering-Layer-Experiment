@@ -99,7 +99,7 @@ class QuantizedModelExtractor(Interpreter):
         for layer_name in self.features.keys():
             torch.save(self.features[layer_name], os.path.join(savepath, f"{layer_name}"))
 
-        with open(os.path.join(self.savepath, 'filelist.txt'), 'wt') as filelist:
+        with open(os.path.join(savepath, 'filelist.txt'), 'wt') as filelist:
             filelist.write('\n'.join([os.path.join(savepath, layer_name) for layer_name in self.features.keys()]))
 
     def extract_activations(self, dataloader, max_iter=5):
