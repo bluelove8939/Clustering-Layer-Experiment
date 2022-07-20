@@ -1,6 +1,8 @@
+import os
 import copy
 import torch
 import torch.quantization.quantize_fx as quantize_fx
+from torch.fx import Interpreter
 
 from tools.progressbar import progressbar
 from tools.training import train, test
@@ -59,3 +61,60 @@ class QuantizationModule(object):
 
         if verbose == 1: print('\n')
         elif verbose: print()
+
+
+class QuantizedModelExtractor(Interpreter):
+    def __init__(self, gm, output_modelname='model', savepath=None):
+        super(QuantizedModelExtractor, self).__init__(gm)
+        self.output_modelname = output_modelname
+        self.features = {}
+        self.traces = []
+        self.savepath = savepath
+
+        if savepath is 'auto':
+            self.savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
+
+        os.makedirs(self.savepath, exist_ok=True)
+
+    def call_module(self, target, *args, **kwargs):
+        for kw in self.traces:
+            if kw in target.split('.'):
+                idx = 0
+                save_output_name = f"{self.output_modelname}_{target}_output{idx}"
+                if save_output_name in self.features:
+                    idx += 1
+                    save_output_name = f"{self.output_modelname}_{target}_output{idx}"
+
+                print(f'extracting {save_output_name}')
+                self.features[save_output_name] = super().call_module(target, *args, **kwargs)
+        return super().call_module(target, *args, **kwargs)
+
+    def add_trace(self, name):
+        self.traces.append(name)
+
+    def save_features(self):
+        for layer_name in self.features.keys():
+            torch.save(self.features[layer_name], os.path.join(self.savepath, f"{layer_name}"))
+
+        with open(os.path.join(self.savepath, 'filelist.txt'), 'wt') as filelist:
+            filelist.write('\n'.join([os.path.join(self.savepath, layer_name) for layer_name in self.features.keys()]))
+
+    def extract_activations(self, target_model, dataloader, max_iter=5):
+        iter_cnt = 0
+        device = target_model.device
+
+        for X, y in dataloader:
+            if iter_cnt > max_iter: break
+            else: iter_cnt += 1
+            X, y = X.to(device), y.to(device)
+            self.run(X)
+
+    def extract_parameters(self, target_model):
+        for param_name in target_model.state_dict():
+            if 'weight' in param_name:
+                parsed_name = f"{self.output_modelname}_{param_name.replace('.', '_')}"
+                try:
+                    print(f"extracting {parsed_name}")
+                    self.features[parsed_name] = target_model.state_dict()[param_name].int_repr().detach()
+                except:
+                    print(f"error occurred on extracting {parsed_name}")
