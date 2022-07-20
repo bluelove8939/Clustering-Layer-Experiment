@@ -200,6 +200,7 @@ if __name__ == '__main__':
     qextractor.add_trace('fc')
     qextractor.extract_activations(test_loader, max_iter=5)
     qextractor.extract_parameters()
+    qextractor.save_features()
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
