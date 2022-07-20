@@ -64,18 +64,13 @@ class QuantizationModule(object):
 
 
 class QuantizedModelExtractor(Interpreter):
-    def __init__(self, gm, output_modelname='model', savepath=None, device='auto'):
+    def __init__(self, gm, output_modelname='model', device='auto'):
         super(QuantizedModelExtractor, self).__init__(gm)
         self.output_modelname = output_modelname
         self.features = {}
         self.traces = []
-        self.savepath = savepath
         self.device = device
         self.target_model = gm
-
-        if savepath is None:
-            self.savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
-        os.makedirs(self.savepath, exist_ok=True)
 
         if device == 'auto':
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -96,12 +91,16 @@ class QuantizedModelExtractor(Interpreter):
     def add_trace(self, name):
         self.traces.append(name)
 
-    def save_features(self):
+    def save_features(self, savepath=None):
+        if savepath is None:
+            savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
+        os.makedirs(savepath, exist_ok=True)
+
         for layer_name in self.features.keys():
-            torch.save(self.features[layer_name], os.path.join(self.savepath, f"{layer_name}"))
+            torch.save(self.features[layer_name], os.path.join(savepath, f"{layer_name}"))
 
         with open(os.path.join(self.savepath, 'filelist.txt'), 'wt') as filelist:
-            filelist.write('\n'.join([os.path.join(self.savepath, layer_name) for layer_name in self.features.keys()]))
+            filelist.write('\n'.join([os.path.join(savepath, layer_name) for layer_name in self.features.keys()]))
 
     def extract_activations(self, dataloader, max_iter=5):
         iter_cnt = 0
