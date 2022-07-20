@@ -31,7 +31,9 @@ parser.add_argument('--tuneiter', action='store' , type=int, default=5, help="fi
 parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
 parser.add_argument('--skip-pruning', default=False, action='store_true',
-                    help='skips training (bool)')
+                    help='skips pruning (bool)')
+parser.add_argument('--skip-calib', default=False, action='store_true',
+                    help='skips quantization calibration (bool)')
 args = parser.parse_args()
 
 
@@ -229,8 +231,13 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
 
     # Quantizing model
-    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1)
-    qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized", device='cpu')
+    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=(not args.skip_calib), verbose=1)
+    if args.skip_calib:
+        print('skip calibration and directly load save statedict')
+        print(f"state dict: {save_fullpath(pamount=prune_amount, quantized=True)}")
+        qmodel.load_state_dict(torch.load(save_fullpath(pamount=prune_amount, quantized=True)))
+    qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized_clustered",
+                                         device='cpu')
     qextractor.add_trace('conv')
     qextractor.add_trace('conv1')
     qextractor.add_trace('conv2')
@@ -242,8 +249,8 @@ if __name__ == '__main__':
     qextractor.extract_parameters()
     qextractor.save_features(savepath=None)
 
-    if 'model_output' not in os.listdir(os.curdir):
-        os.mkdir(os.path.join(os.curdir, 'model_output'))
-    torch.save(qmodel.state_dict(), save_fullpath(pamount=prune_amount, quantized=True))
+    # if 'model_output' not in os.listdir(os.curdir):
+    #     os.mkdir(os.path.join(os.curdir, 'model_output'))
+    # torch.save(qmodel.state_dict(), save_fullpath(pamount=prune_amount, quantized=True))
 
     # show_activations(model, channel_size=9)
