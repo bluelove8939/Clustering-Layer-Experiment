@@ -32,8 +32,6 @@ parser.add_argument('--skip-training', default=False, action='store_true',
                     help='skips training (bool)')
 parser.add_argument('--skip-pruning', default=False, action='store_true',
                     help='skips pruning (bool)')
-parser.add_argument('--skip-calib', default=False, action='store_true',
-                    help='skips quantization calibration (bool)')
 args = parser.parse_args()
 
 
@@ -231,11 +229,10 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
 
     # Quantizing model
-    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=(not args.skip_calib), verbose=1)
-    if args.skip_calib:
-        print('skip calibration and directly load save statedict')
-        print(f"state dict: {save_fullpath(pamount=prune_amount, quantized=True)}")
-        qmodel.load_state_dict(torch.load(save_fullpath(pamount=prune_amount, quantized=True)))
+    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1)
+    test(test_loader, qmodel, loss_fn=loss_fn, verbose=1)
+
+    # Extract output activations
     qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized_clustered",
                                          device='cpu')
     qextractor.add_trace('conv')
