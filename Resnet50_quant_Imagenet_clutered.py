@@ -122,6 +122,8 @@ if __name__ == '__main__':
     quant_module = QuantizationModule(tuning_loader, loss_fn=loss_fn, optimizer=optimizer)
     model.load_state_dict(torch.load(normal.save_fullpath))
     model.set_clust_threshold(0.01, 0.05, 0.02, 0.02, 0.1)
-    quanitzed_model = quant_module.quantize(model, default_qconfig='fbgemm', verbose=1)
+    quantized_model = quant_module.quantize(model, default_qconfig='fbgemm', verbose=1)
 
-    torch.save(quanitzed_model.state_dict(), save_fullpath)
+    torch.save(quantized_model.state_dict(), save_fullpath)
+
+    validate(test_loader, quantized_model, loss_fn, args)
