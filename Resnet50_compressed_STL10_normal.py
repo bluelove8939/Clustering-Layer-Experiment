@@ -198,8 +198,8 @@ if __name__ == '__main__':
     qextractor.add_trace('conv4')
     qextractor.add_trace('conv5')
     qextractor.add_trace('fc')
-    qextractor.extract_activations(qmodel, test_loader, max_iter=5)
-    qextractor.extract_parameters(qmodel)
+    qextractor.extract_activations(test_loader, max_iter=5)
+    qextractor.extract_parameters()
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))

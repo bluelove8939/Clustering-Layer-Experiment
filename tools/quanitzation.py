@@ -99,9 +99,11 @@ class QuantizedModelExtractor(Interpreter):
         with open(os.path.join(self.savepath, 'filelist.txt'), 'wt') as filelist:
             filelist.write('\n'.join([os.path.join(self.savepath, layer_name) for layer_name in self.features.keys()]))
 
-    def extract_activations(self, target_model, dataloader, max_iter=5):
+    def extract_activations(self, dataloader, max_iter=5, device='auto'):
+        if device == "auto":
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+
         iter_cnt = 0
-        device = target_model.device
 
         for X, y in dataloader:
             if iter_cnt > max_iter: break
@@ -109,7 +111,8 @@ class QuantizedModelExtractor(Interpreter):
             X, y = X.to(device), y.to(device)
             self.run(X)
 
-    def extract_parameters(self, target_model):
+    def extract_parameters(self):
+        target_model = self.gm
         for param_name in target_model.state_dict():
             if 'weight' in param_name:
                 parsed_name = f"{self.output_modelname}_{param_name.replace('.', '_')}"
