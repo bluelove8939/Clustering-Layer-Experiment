@@ -30,7 +30,7 @@ class QuantizationModule(object):
 
         if verbose: print("preparing quantization (symbolic tracing)")
         model_prepared = quantize_fx.prepare_fx(quant_model, qconfig_dict)
-        if verbose: print(model_prepared)
+        if verbose == 2: print(model_prepared)
 
         if calib: self.calibrate(model_prepared, verbose=verbose, device=device)
         model_quantized = quantize_fx.convert_fx(model_prepared)
@@ -71,7 +71,7 @@ class QuantizedModelExtractor(Interpreter):
         self.traces = []
         self.savepath = savepath
 
-        if savepath is 'auto':
+        if savepath is None:
             self.savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
 
         os.makedirs(self.savepath, exist_ok=True)
