@@ -71,6 +71,7 @@ class QuantizedModelExtractor(Interpreter):
         self.traces = []
         self.savepath = savepath
         self.device = device
+        self.target_model = gm
 
         if savepath is None:
             self.savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
@@ -112,12 +113,11 @@ class QuantizedModelExtractor(Interpreter):
             self.run(X)
 
     def extract_parameters(self):
-        target_model = self.gm
-        for param_name in target_model.state_dict():
+        for param_name in self.target_model.state_dict():
             if 'weight' in param_name:
                 parsed_name = f"{self.output_modelname}_{param_name.replace('.', '_')}"
                 try:
                     print(f"extracting {parsed_name}")
-                    self.features[parsed_name] = target_model.state_dict()[param_name].int_repr().detach()
+                    self.features[parsed_name] = self.target_model.state_dict()[param_name].int_repr().detach()
                 except:
                     print(f"error occurred on extracting {parsed_name}")
