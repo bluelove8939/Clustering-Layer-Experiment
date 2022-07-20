@@ -41,7 +41,7 @@ def set_logger(info=None, verbose=False):
 @torch.fx.wrap
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.size()
-    img_reshaped = img.view(-1, cacheline_size)
+    img_reshaped = img.reshape(-1, cacheline_size)
     clustered_masks = torch.zeros_like(img_reshaped).type(torch.bool)
     masks = torch.ones_like(img_reshaped)
 
