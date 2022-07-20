@@ -188,9 +188,9 @@ if __name__ == '__main__':
         model.load_state_dict(torch.load(save_fullpath(pamount=prune_amount)))
 
     # Quantizing model
-    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1, device="auto")
+    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1)
     qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized",
-                                         savepath=None)
+                                         savepath=None, device='cpu')
     qextractor.add_trace('conv')
     qextractor.add_trace('conv1')
     qextractor.add_trace('conv2')

@@ -64,17 +64,20 @@ class QuantizationModule(object):
 
 
 class QuantizedModelExtractor(Interpreter):
-    def __init__(self, gm, output_modelname='model', savepath=None):
+    def __init__(self, gm, output_modelname='model', savepath=None, device='auto'):
         super(QuantizedModelExtractor, self).__init__(gm)
         self.output_modelname = output_modelname
         self.features = {}
         self.traces = []
         self.savepath = savepath
+        self.device = device
 
         if savepath is None:
             self.savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
-
         os.makedirs(self.savepath, exist_ok=True)
+
+        if device == 'auto':
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
 
     def call_module(self, target, *args, **kwargs):
         for kw in self.traces:
@@ -99,16 +102,13 @@ class QuantizedModelExtractor(Interpreter):
         with open(os.path.join(self.savepath, 'filelist.txt'), 'wt') as filelist:
             filelist.write('\n'.join([os.path.join(self.savepath, layer_name) for layer_name in self.features.keys()]))
 
-    def extract_activations(self, dataloader, max_iter=5, device='auto'):
-        if device == "auto":
-            device = "cuda" if torch.cuda.is_available() else "cpu"
-
+    def extract_activations(self, dataloader, max_iter=5):
         iter_cnt = 0
 
         for X, y in dataloader:
             if iter_cnt > max_iter: break
             else: iter_cnt += 1
-            X, y = X.to(device), y.to(device)
+            X, y = X.to(self.device), y.to(self.device)
             self.run(X)
 
     def extract_parameters(self):
