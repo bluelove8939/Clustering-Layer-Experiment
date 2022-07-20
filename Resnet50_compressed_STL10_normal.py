@@ -180,8 +180,8 @@ if __name__ == '__main__':
     test(test_loader, model, loss_fn=loss_fn, verbose=1)
 
     # Quantizing model
-    qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1, device="auto")
-    qextractor = QuantizedModelExtractor(model, output_modelname=f"{model_type}_p{prune_amount}_quantized",
+    qmodel = qmodule.quantize(model, default_qconfig='fbgemm', calib=True, verbose=1, device="auto")
+    qextractor = QuantizedModelExtractor(qmodel, output_modelname=f"{model_type}_p{prune_amount}_quantized",
                                          savepath=None)
     qextractor.add_trace('conv')
     qextractor.add_trace('conv1')
@@ -190,11 +190,11 @@ if __name__ == '__main__':
     qextractor.add_trace('conv4')
     qextractor.add_trace('conv5')
     qextractor.add_trace('fc')
-    qextractor.extract_activations(model, test_loader, max_iter=5)
-    qextractor.extract_parameters(model)
+    qextractor.extract_activations(qmodel, test_loader, max_iter=5)
+    qextractor.extract_parameters(qmodel)
 
     if 'model_output' not in os.listdir(os.curdir):
         os.mkdir(os.path.join(os.curdir, 'model_output'))
-    torch.save(model.state_dict(), save_fullpath(pamount=prune_amount, quantized=True))
+    torch.save(qmodel.state_dict(), save_fullpath(pamount=prune_amount, quantized=True))
 
     # show_activations(model, channel_size=9)
