@@ -86,6 +86,7 @@ class QuantizedModelExtractor(Interpreter):
 
                 print(f'extracting {save_output_name}')
                 self.features[save_output_name] = super().call_module(target, *args, **kwargs)
+                print(self.features[save_output_name])
         return super().call_module(target, *args, **kwargs)
 
     def add_trace(self, name):
