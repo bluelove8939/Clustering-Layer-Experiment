@@ -11,7 +11,7 @@ output_modelname = 'Resnet50_STL10_normal'
 savepath = os.path.join(os.curdir, 'model_activations_raw', output_modelname)
 
 normal_act_extractor = ActivationExtractor(normal.model, output_modelname=output_modelname, device=normal.device)
-normal_act_extractor.register_hook(normal.model.conv1, 'conv1')
+normal_act_extractor.register_hook(normal.model.relu, 'conv1')
 normal_act_extractor.register_hook(normal.model.layer1, 'layer1')
 normal_act_extractor.register_hook(normal.model.layer2, 'layer2')
 normal_act_extractor.register_hook(normal.model.layer3, 'layer3')
