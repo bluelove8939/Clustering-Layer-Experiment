@@ -18,10 +18,12 @@ clustering_test_results = []
 
 # Test dataset generation
 total_datasize = len(clustered.test_dataset)
-valid_datasize = int(total_datasize / 16)
-print(f"test dataset size: {valid_datasize}/{total_datasize}")
-test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
-test_loader = DataLoader(test_dataset, batch_size=10)
+# valid_datasize = int(total_datasize / 16)
+# print(f"test dataset size: {valid_datasize}/{total_datasize}")
+# test_dataset, _ = torch.utils.data.random_split(clustered.test_dataset, [valid_datasize, total_datasize-valid_datasize])
+# test_loader = DataLoader(test_dataset, batch_size=10)
+valid_datasize = total_datasize
+test_loader = normal.test_loader
 loss_fn = clustered.loss_fn
 
 # Test with normal model as a reference
