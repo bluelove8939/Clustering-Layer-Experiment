@@ -5,8 +5,8 @@ from enum import Enum
 from tools.progressbar import progressbar
 
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using {device} device")
+# device = "cuda" if torch.cuda.is_available() else "cpu"
+# print(f"Using {device} device")
 
 
 class AverageMeter(object):
@@ -38,9 +38,9 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
-def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, tdevice='auto'):
-    if tdevice != 'auto':
-        device = tdevice
+def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, device='auto'):
+    if device == 'auto':
+        device = "cuda" if torch.cuda.is_available() else "cpu"
 
     size = len(dataloader.dataset)  # size of the dataset
     lossmeter = AverageMeter('loss', fmt=':.4f')
@@ -77,9 +77,9 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, t
     if verbose == 1: print('')
 
 
-def test(dataloader, model, loss_fn, verbose=2, savelog_path=None, tdevice='auto'):
-    if tdevice != 'auto':
-        device = tdevice
+def test(dataloader, model, loss_fn, verbose=2, savelog_path=None, device='auto'):
+    if device == 'auto':
+        device = "cuda" if torch.cuda.is_available() else "cpu"
 
     size = len(dataloader.dataset)  # dataset size
     num_batches = len(dataloader)   # the number of batches
