@@ -38,23 +38,40 @@ def set_logger(info=None, verbose=False):
     return logger
 
 
+# @torch.fx.wrap
+# def cluster_img(img, threshold, cacheline_size):
+#     img_shape = img.size()
+#     img_reshaped = img.reshape(-1, cacheline_size)
+#     clustered_masks = torch.zeros_like(img_reshaped).type(torch.bool)
+#     masks = torch.ones_like(img_reshaped)
+#
+#     for idx in range(cacheline_size):
+#         sel_column = img_reshaped[:, idx]
+#         masks[:, idx] = 0
+#         # masks_embed = masks[:, idx]
+#         # masks_embed -= masks_embed
+#         sel_column = sel_column.repeat(cacheline_size, 1).transpose(0, 1)
+#         delta_masks = (torch.abs(img_reshaped - sel_column).le(threshold) * masks).type(torch.bool)
+#         img_reshaped = torch.where(torch.logical_and(delta_masks == True, clustered_masks == False),
+#                                    sel_column, img_reshaped)
+#         clustered_masks = torch.logical_or(clustered_masks, delta_masks)
+#
+#     return torch.reshape(img_reshaped, img_shape)
+
+
 @torch.fx.wrap
 def cluster_img(img, threshold, cacheline_size):
     img_shape = img.size()
     img_reshaped = img.reshape(-1, cacheline_size)
-    clustered_masks = torch.zeros_like(img_reshaped).type(torch.bool)
-    masks = torch.ones_like(img_reshaped)
+    centroids = img_reshaped[:, 0].clone().detach()
+    # counts = torch.zeros_like(centroids)
 
     for idx in range(cacheline_size):
         sel_column = img_reshaped[:, idx]
-        masks[:, idx] = 0
-        # masks_embed = masks[:, idx]
-        # masks_embed -= masks_embed
-        sel_column = sel_column.repeat(cacheline_size, 1).transpose(0, 1)
-        delta_masks = (torch.abs(img_reshaped - sel_column).le(threshold) * masks).type(torch.bool)
-        img_reshaped = torch.where(torch.logical_and(delta_masks == True, clustered_masks == False),
-                                   sel_column, img_reshaped)
-        clustered_masks = torch.logical_or(clustered_masks, delta_masks)
+        mask = torch.le(torch.abs(sel_column - centroids), threshold)
+        sel_column[:] = torch.where(mask, centroids, sel_column)
+        centroids[:] = torch.where(mask, centroids, sel_column)
+        # counts[:] = torch.where(mask, counts+1, counts)
 
     return torch.reshape(img_reshaped, img_shape)
 
