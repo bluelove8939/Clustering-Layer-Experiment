@@ -26,7 +26,7 @@ class ActivationExtractor(object):
             while f"{name}_output{oidx}" in self._activation.keys(): oidx += 1
             save_output_name = f"{name}_output{oidx}"
             self._activation[save_output_name] = layer_output.detach()
-            print(f'extracting {save_output_name}')
+            print(f'extracting {save_output_name} (type: {self._activation[save_output_name].type})')
 
         return hook
 
