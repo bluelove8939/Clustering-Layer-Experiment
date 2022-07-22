@@ -15,6 +15,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from tools.progressbar import progressbar
+from tools.training import test, train
 from custom_layers import clustering
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -118,48 +119,10 @@ optimizer = optim.Adam(model.parameters(), lr=lr)
 loss_fn = nn.CrossEntropyLoss().to(device)
 
 
-def train(dataloader, model, loss_fn, optimizer):
-    size = len(dataloader.dataset)  # size of the dataset
-    model.train()                   # turn the model into train mode
-    for batch, (X, y) in enumerate(dataloader):  # each index of dataloader will be batch index
-        X, y = X.to(device), y.to(device)        # extract input and output
-
-        # Compute prediction error
-        pred = model(X)          # predict model
-        # print(pred.shape, y.shape)
-        loss = loss_fn(pred, y)  # calculate loss
-
-        # Backpropagation
-        optimizer.zero_grad()  # gradient initialization (just because torch accumulates gradient)
-        loss.backward()        # backward propagate with the loss value (or vector)
-        optimizer.step()       # update parameters
-
-        if batch % 100 == 0:
-            loss, current = loss.item(), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
-
-def test(dataloader, model, loss_fn):
-    size = len(dataloader.dataset)  # dataset size
-    num_batches = len(dataloader)   # the number of batches
-    model.eval()                    # convert model into evaluation mode
-    test_loss, correct = 0, 0       # check total loss and count correctness
-    with torch.no_grad():           # set all of the gradient into zero
-        for didx, (X, y) in enumerate(dataloader):
-            X, y = X.to(device), y.to(device)     # extract input and output
-            pred = model(X)                       # predict with the given model
-            test_loss += loss_fn(pred, y).item()  # acculmulate total loss
-            correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
-            print(f"\rtest status: {progressbar(didx+1, len(dataloader), scale=50)} {(didx+1) / len(dataloader) * 100:2.0f}%",end='')
-    test_loss /= num_batches   # make an average of the total loss
-    correct /= size            # make an average with correctness count
-    print(f"\nTest Error: \n Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
-    return 100 * correct, test_loss
-
-
 save_dirpath = os.path.join(os.curdir, 'model_output')
 if not os.path.exists(save_dirpath):
     os.makedirs(save_dirpath)
-save_modelname = "Resnet50_STL10_clustered.pth"
+save_modelname = "Resnet50_STL10_clustered_p.pth"
 save_fullpath = os.path.join(save_dirpath, save_modelname)
 
 def show_activations(model, channel_size=9):
