@@ -26,6 +26,8 @@ normal_act_extractor.save_activation(savepath=savepath)
 
 
 clustered.model.load_state_dict(torch.load(normal.save_fullpath))
+clustered.model.set_clust_threshold(0.01, 0.05, 0.02, 0.02, 0.1)
+clustered.model.reset_clust_layer()
 output_modelname = 'Resnet50_STL10_clustered'
 savepath = os.path.join(os.curdir, 'model_activations_raw', output_modelname)
 
