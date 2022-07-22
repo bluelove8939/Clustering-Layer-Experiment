@@ -8,7 +8,7 @@ from tools.extractor import ActivationExtractor, ParamsExtractor
 
 normal.model.load_state_dict(torch.load(normal.save_fullpath))
 output_modelname = 'Resnet50_STL10_normal'
-savepath = os.path.join(os.curdir, 'model_activations_raw')
+savepath = os.path.join(os.curdir, 'model_activations_raw', output_modelname)
 
 normal_act_extractor = ActivationExtractor(normal.model, output_modelname=output_modelname, device=normal.device)
 normal_act_extractor.register_hook(normal.model.conv1, 'conv1')
@@ -27,7 +27,7 @@ normal_param_extractor.save_params(savepath=savepath)
 
 clustered.model.load_state_dict(torch.load(normal.save_fullpath))
 output_modelname = 'Resnet50_STL10_clustered'
-savepath = os.path.join(os.curdir, 'model_activations_raw')
+savepath = os.path.join(os.curdir, 'model_activations_raw', output_modelname)
 
 clustered_act_extractor = ActivationExtractor(clustered.model, output_modelname=output_modelname, device=clustered.device)
 clustered_act_extractor.register_hook(clustered.model.clust1, 'conv1')
