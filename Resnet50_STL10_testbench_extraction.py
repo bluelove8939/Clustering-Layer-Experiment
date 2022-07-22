@@ -25,7 +25,7 @@ normal_param_extractor.extract_params()
 normal_param_extractor.save_params(savepath=savepath)
 
 
-clustered.model.load_state_dict(torch.load(clustered.save_fullpath))
+clustered.model.load_state_dict(torch.load(normal.save_fullpath))
 output_modelname = 'Resnet50_STL10_clustered'
 savepath = os.path.join(os.curdir, 'model_activations_raw')
 
