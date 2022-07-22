@@ -38,7 +38,7 @@ class AverageMeter(object):
         return fmtstr.format(**self.__dict__)
 
 
-def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, device='auto'):
+def train(dataloader, model, loss_fn, optimizer, verbose=1, savelog_path=None, device='auto'):
     if device == 'auto':
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -77,7 +77,7 @@ def train(dataloader, model, loss_fn, optimizer, verbose=2, savelog_path=None, d
     if verbose == 1: print('')
 
 
-def test(dataloader, model, loss_fn, verbose=2, savelog_path=None, device='auto'):
+def test(dataloader, model, loss_fn, verbose=1, savelog_path=None, device='auto'):
     if device == 'auto':
         device = "cuda" if torch.cuda.is_available() else "cpu"
 
