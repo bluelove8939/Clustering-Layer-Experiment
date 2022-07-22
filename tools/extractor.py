@@ -57,7 +57,7 @@ class ParamsExtractor(object):
     def __init__(self, target_model, output_modelname='model'):
         self.target_model = target_model
         self.output_modelname = output_modelname
-        self.params = {}
+        self._params = {}
         self.traces = []
 
     def add_trace(self, trace):
@@ -71,7 +71,15 @@ class ParamsExtractor(object):
                     parsed_name = f"{self.output_modelname}_{param_name.replace('.', '_')}"
                     try:
                         print(f"extracting {parsed_name}")
-                        self.params[parsed_name] = self.target_model.state_dict()[param_name].detach()
+                        self._params[parsed_name] = self.target_model.state_dict()[param_name].detach()
                     except:
                         print(f"error occurred on extracting {parsed_name}")
                     break
+
+    def save_params(self, savepath=None):
+        if savepath is None:
+            savepath = os.path.join(os.curdir, 'model_activations_raw', self.output_modelname)
+        os.makedirs(savepath, exist_ok=True)
+
+        for layer_name in self._params.keys():
+            torch.save(self._params[layer_name], os.path.join(savepath, f"{layer_name}"))
