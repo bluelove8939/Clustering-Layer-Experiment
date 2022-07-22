@@ -50,8 +50,8 @@ def test_case_gen(layer_num, **kwargs):
     for case in product(*[thresholds for _ in range(layer_num)]):
         flag = False
         for idx in range(layer_num):
-            if f"layer{idx}_min" in kwargs.keys() and case[idx] < kwargs.get(f"layer{idx}_min"): flag = True
-            if f"layer{idx}_max" in kwargs.keys() and case[idx] < kwargs.get(f"layer{idx}_max"): flag = True
+            if f"layer{idx}_min" in kwargs.keys() and case[idx] >= kwargs.get(f"layer{idx}_min"): flag = True
+            if f"layer{idx}_max" in kwargs.keys() and case[idx] <= kwargs.get(f"layer{idx}_max"): flag = True
 
         if not flag:
             testcases.append(case)
