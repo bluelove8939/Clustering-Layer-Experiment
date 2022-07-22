@@ -93,18 +93,18 @@ def test(dataloader, model, loss_fn, verbose=2, savelog_path=None, tdevice='auto
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()  # count correctness
 
             if verbose == 1:
-                print(f"\rtest status:  {progressbar(didx+1, len(dataloader), scale=50)} "
-                      f"{(didx+1) / len(dataloader) * 100:3.0f}%",end='')
+                sys.stdout.write(f"\rtest status:  {progressbar(didx+1, len(dataloader), scale=50)} "
+                                 f"{(didx+1) / len(dataloader) * 100:3.0f}%")
             elif verbose:
-                print(f"test status:  {progressbar(didx+1, len(dataloader), scale=50)} "
-                      f"{(didx+1) / len(dataloader) * 100:3.0f}%")
+                sys.stdout.write(f"test status:  {progressbar(didx+1, len(dataloader), scale=50)} "
+                                 f"{(didx+1) / len(dataloader) * 100:3.0f}%\n")
 
     test_loss /= num_batches   # make an average of the total loss
     correct /= size            # make an average with correctness count
 
     if verbose:
         if verbose == 1: print()
-        print(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}")
+        sys.stdout.write(f"Accuracy: {(100*correct):>0.1f}%, Avg loss: {test_loss:>8f}\n")
 
     if savelog_path is not None:
         with open(savelog_path, 'at') as logfile:
