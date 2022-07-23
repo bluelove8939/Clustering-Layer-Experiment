@@ -47,7 +47,9 @@ class ActivationExtractor(object):
         os.makedirs(savepath, exist_ok=True)
 
         for layer_name in self._activation.keys():
-            torch.save(self._activation[layer_name], os.path.join(savepath, f"{layer_name}"))
+            barr = self._activation[layer_name].detach().numpy()
+            with open(os.path.join(savepath, f"{layer_name}"), 'wb') as file:
+                file.write(barr)
 
         with open(os.path.join(savepath, 'filelist.txt'), 'wt') as filelist:
             filelist.write('\n'.join([os.path.join(savepath, layer_name) for layer_name in self._activation.keys()]))
@@ -82,4 +84,6 @@ class ParamsExtractor(object):
         os.makedirs(savepath, exist_ok=True)
 
         for layer_name in self._params.keys():
-            torch.save(self._params[layer_name], os.path.join(savepath, f"{layer_name}"))
+            barr = self._params[layer_name].detach().numpy()
+            with open(os.path.join(savepath, f"{layer_name}"), 'wb') as file:
+                file.write(barr)
