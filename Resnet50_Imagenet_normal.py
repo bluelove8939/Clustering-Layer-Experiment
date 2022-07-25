@@ -85,7 +85,7 @@ def show_activations(model, channel_size=9):
     activation = {}
 
     def get_activation(name):
-        def hook(model, input, output):
+        def hook(model, layer_input, layer_output):
             activation[name] = output.detach()[0][:channel_size]
             print(f"{name} called -> output shape: {output.detach().shape}")
 
